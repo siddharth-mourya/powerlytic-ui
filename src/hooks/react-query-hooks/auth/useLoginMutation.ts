@@ -46,11 +46,9 @@ export const useLoginMutation = () => {
       if (decoded.role === "orgAdmin") router.push("/dashboard/org-admin");
       if (decoded.role === "orgOperator") router.push("/dashboard/operator");
     },
-    onError: (error: any) => {
-      console.error("Login failed:", error.response?.data || error.message);
-      alert(
-        "Login failed: " + (error.response?.data?.message || error.message)
-      );
+    onError: (error) => {
+      console.error("Login failed:", error.message);
+      
     },
   });
 };

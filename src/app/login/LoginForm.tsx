@@ -11,7 +11,7 @@ type LoginForm = {
 export default function LoginPage() {
   const [form, setForm] = useState<LoginForm>({ email: "", password: "" });
 
-  const { mutate, isLoading, error, isError } = useLoginMutation();
+  const { mutate, error, isError } = useLoginMutation();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -77,9 +77,10 @@ export default function LoginPage() {
           <button
             type="submit"
             className="btn btn-primary w-full"
-            disabled={isLoading}
+            // disabled={isLoading}
           >
-            {isLoading ? "Logging in..." : "Login"}
+            Login
+            {/* {isLoading ? "Logging in..." : "Login"} */}
           </button>
         </form>
 

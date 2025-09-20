@@ -3,10 +3,11 @@
 import { ReactNode, useEffect, useState } from "react";
 import Sidebar from "./SideBar";
 
+type Role = "companyAdmin" | "orgAdmin" | "orgOperator";
 // fake role fetcher (replace with real auth decoding)
-function getRoleFromStorage(): "companyAdmin" | "orgAdmin" | "orgOperator" {
+function getRoleFromStorage(): Role {
   if (typeof window !== "undefined") {
-    return (localStorage.getItem("role") as any) || "orgOperator";
+    return (localStorage.getItem("role") as Role) || "orgOperator";
   }
   return "orgOperator";
 }
