@@ -1,11 +1,8 @@
+"use client";
+
 import LoginCard from "./LoginCard";
+import LoginForm from "./LoginForm";
 
-const LoginPage = () => {
-  return (
-    <div>
-      <LoginCard />
-    </div>
-  );
-};
-
-export default LoginPage;
+export default function LoginPage() {
+  return <LoginForm />;
+}
