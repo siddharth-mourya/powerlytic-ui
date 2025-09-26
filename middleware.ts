@@ -1,52 +1,51 @@
-import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken"; // or jose if you prefer
+// middleware.ts
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-interface JWTPayload {
-  role: "companyAdmin" | "orgAdmin" | "orgOperator";
-  exp: number;
-  iat: number;
-}
+const protectedRoutes = ["/dashboard", "/devices", "/users", "/organizations"];
+
+const permissions = {
+  dashboard: ["COMPANY_ADMIN", "ORG_ADMIN", "ORG_USER"],
+  organizations: ["COMPANY_ADMIN"],
+  users: ["COMPANY_ADMIN", "ORG_ADMIN"],
+  devices: ["COMPANY_ADMIN", "ORG_ADMIN", "ORG_USER"],
+};
 
 export function middleware(req: NextRequest) {
-  const token = req.cookies.get("token")?.value;
+  const { pathname } = req.nextUrl;
 
-  if (!token) {
-    return NextResponse.redirect(new URL("/login", req.url));
-  }
+  // Only protect specific routes
+  const route = protectedRoutes.find((r) => pathname.startsWith(r));
+  if (!route) return NextResponse.next();
 
-  let decoded: JWTPayload | null = null;
+  // Get JWT from cookies or header
+  const token =
+    req.cookies.get("token")?.value ||
+    req.headers.get("authorization")?.split(" ")[1];
+  if (!token) return NextResponse.redirect(new URL("/login", req.url));
 
   try {
-    decoded = jwt.decode(token) as JWTPayload;
+    const payload = JSON.parse(
+      Buffer.from(token.split(".")[1], "base64").toString()
+    );
+    const role = payload.role;
+
+    if (!permissions[route as keyof typeof permissions].includes(role)) {
+      return NextResponse.redirect(new URL("/403", req.url));
+    }
   } catch (err) {
-    console.error("JWT decode failed", err);
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  const pathname = req.nextUrl.pathname;
-
-  if (decoded.role === "companyAdmin") {
-    if (!pathname.startsWith("/dashboard/company")) {
-      return NextResponse.redirect(new URL("/dashboard/company", req.url));
-    }
-  }
-
-  if (decoded.role === "orgAdmin") {
-    if (!pathname.startsWith("/dashboard/org-admin")) {
-      return NextResponse.redirect(new URL("/dashboard/org-admin", req.url));
-    }
-  }
-
-  if (decoded.role === "orgOperator") {
-    if (!pathname.startsWith("/dashboard/operator")) {
-      return NextResponse.redirect(new URL("/dashboard/operator", req.url));
-    }
-  }
-
-  // ✅ allow request to continue
   return NextResponse.next();
 }
 
+// Apply to all paths
 export const config = {
-  matcher: ["/dashboard/:path*"], // protect all dashboard routes
+  matcher: [
+    "/dashboard/:path*",
+    "/devices/:path*",
+    "/users/:path*",
+    "/organizations/:path*",
+  ],
 };

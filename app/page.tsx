@@ -1,7 +1,7 @@
 // app/page.tsx
 "use client";
 
-import { useHealthCheckRQ } from "./_hooks/react-query-hooks/health/useHealthCheckRQ";
+import { useHealthCheckRQ } from "./_lib/_react-query-hooks/health/useHealthCheckRQ";
 
 export default function HomePage() {
   const data = useHealthCheckRQ();

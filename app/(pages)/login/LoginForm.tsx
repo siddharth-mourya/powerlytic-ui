@@ -1,6 +1,6 @@
 "use client";
 
-import { useLoginMutation } from "@/app/_hooks/react-query-hooks/auth/useLoginMutation";
+import { useLoginMutation } from "@/app/_lib/_react-query-hooks/auth/useLoginMutation";
 import { useState } from "react";
 
 type LoginForm = {
