@@ -9,8 +9,10 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.0.1",
     "@tanstack/react-query": "^5.89.0",
     "@tanstack/react-query-devtools": "^5.89.0",
+    "@tanstack/react-table": "^8.21.3",
     "axios": "^1.12.2",
     "daisyui": "^5.1.13",
     "jsonwebtoken": "^9.0.2",

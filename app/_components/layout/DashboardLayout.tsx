@@ -1,13 +1,13 @@
 "use client";
 
 import { ReactNode } from "react";
-import Sidebar from "./SideBar";
+import Header from "./Header";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="flex">
-      <Sidebar />
-      <main className="flex-1 p-6">{children}</main>
+    <div className="flex min-h-screen min-w-screen flex-col">
+      <Header />
+      <div className="flex-1">{children}</div>
     </div>
   );
 }

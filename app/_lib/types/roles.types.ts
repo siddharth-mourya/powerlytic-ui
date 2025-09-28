@@ -1,8 +1,8 @@
 // lib/permissions.ts
-export type Role = "companyAdmin" | "orgAdmin" | "orgOperator";
+export type Role = "CompanyAdmin" | "OrgAdmin" | "OrgUser";
 
 export const Roles: Record<string, Role> = {
-  COMPANY_ADMIN: "companyAdmin",
-  ORG_ADMIN: "orgAdmin",
-  ORG_USER: "orgOperator",
+  COMPANY_ADMIN: "CompanyAdmin",
+  ORG_ADMIN: "OrgAdmin",
+  ORG_USER: "OrgUser",
 };

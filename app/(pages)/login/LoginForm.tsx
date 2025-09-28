@@ -28,10 +28,10 @@ export default function LoginForm() {
         {/* Logo / Header */}
         <div className="flex flex-col items-center mb-8">
           <div className="w-16 h-16 rounded-full bg-primary text-white flex items-center justify-center text-2xl font-bold shadow-md">
-            IoT
+            IOT
           </div>
           <h2 className="mt-4 text-2xl font-bold text-gray-800">
-            IoT Portal Login
+            Powerlytic Login
           </h2>
           <p className="text-gray-500 text-sm">Sign in to continue</p>
         </div>

@@ -1,30 +1,21 @@
-"use client";
+// store/authStore.ts
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 import { Role } from "../types/roles.types";
 
-export type User = { email: string; role: Role };
+type User = {
+  _id: string;
+  role: Role;
+  orgId: string;
+};
 
 type AuthState = {
   user: User | null;
-  login: (token: string) => void;
+  setUser: (user: User | null) => void;
   logout: () => void;
 };
 
-export const useAuthStore = create<AuthState>()(
-  persist(
-    (set) => ({
-      user: null,
-      login: (token: string) => {
-        const decoded = JSON.parse(atob(token.split(".")[1]));
-        set({ user: { email: decoded.email, role: decoded.role } });
-        localStorage.setItem("token", token);
-      },
-      logout: () => {
-        set({ user: null });
-        localStorage.removeItem("token");
-      },
-    }),
-    { name: "auth-storage" }
-  )
-);
+export const useAuthStore = create<AuthState>((set) => ({
+  user: null,
+  setUser: (user) => set({ user }),
+  logout: () => set({ user: null }),
+}));

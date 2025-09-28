@@ -1,21 +1,25 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
 import { api } from "@/app/_lib/api/axios";
+import { useAuthStore } from "../../stores/useAuthStore";
+import { Role } from "../../types/roles.types";
+import { User } from "./useCurrentLoggedinUserRQ";
+import { queryKeys } from "../queryKeys";
 
-interface DecodedToken {
+export interface DecodedToken {
   userId: string;
-  role: string;
+  role: Role;
   orgId: string;
+  email: string;
+  iat: number;
+  exp: number;
 }
 
 interface LoginResponse {
-  token: string;
-  user: {
-    id: string;
-    email: string;
-    name: string;
-  };
+  accessToken: string;
+  refreshToken: string;
+  user: User;
 }
 
 interface LoginRequest {
@@ -25,6 +29,7 @@ interface LoginRequest {
 
 export const useLoginMutation = () => {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const mutationFn = (params: LoginRequest): Promise<LoginResponse> => {
     return api
@@ -36,19 +41,14 @@ export const useLoginMutation = () => {
     mutationFn: mutationFn,
     retry: 1,
     onSuccess: (data) => {
-      console.log("Login successful:", data);
-      localStorage.setItem("token", data.token);
-
-      const decoded = jwtDecode<DecodedToken>(data.token);
-      localStorage.setItem("role", decoded.role);
-
-      if (decoded.role === "companyAdmin") router.push("/dashboard/company");
-      if (decoded.role === "orgAdmin") router.push("/dashboard/org-admin");
-      if (decoded.role === "orgOperator") router.push("/dashboard/operator");
+      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("refreshToken", data.refreshToken);
     },
     onError: (error) => {
       console.error("Login failed:", error.message);
-      
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: [queryKeys.auth.profile] });
     },
   });
 };

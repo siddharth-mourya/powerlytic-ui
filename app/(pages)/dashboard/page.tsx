@@ -1,13 +1,13 @@
-import DashboardLayout from "@/app/_components/layout/DashboardLayout";
+"use client";
+import { RoleProtectedPage } from "@/app/_components/RBAC/RoleProtectedPage";
+import { CurrentUserProfile } from "./components/CurrentUserProfile/CurrentUserProfile";
 
-const DashboardPage: React.FC = () => {
+const DashboardPage = () => {
   return (
-    <main>
-      <DashboardLayout>
-        <h1>Dashboard</h1>
-        <p>Welcome to your dashboard!</p>
-      </DashboardLayout>
-    </main>
+    <RoleProtectedPage resource="dashboard">
+      <h1 className="text-2xl">Dashboard</h1>
+      <CurrentUserProfile />
+    </RoleProtectedPage>
   );
 };
 
