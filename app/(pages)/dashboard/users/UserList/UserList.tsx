@@ -1,6 +1,7 @@
 "use client";
 
 import { GenericTable } from "@/app/_components/GenericTable/GenericTable";
+import { useListAllUsersRQ } from "@/app/_lib/_react-query-hooks/users/useListAllUsers";
 import { ColumnDef } from "@tanstack/react-table";
 
 type User = {
@@ -41,5 +42,7 @@ const columns: ColumnDef<User>[] = [
 ];
 
 export function UsersList() {
+  const { data: userList } = useListAllUsersRQ();
+  console.log("userList", userList);
   return <GenericTable data={data} columns={columns} />;
 }

@@ -4,5 +4,8 @@ export const queryKeys = {
     login: "auth-login",
     logout: "auth-logout",
   },
-    healthCheck: "health-check",
+  healthCheck: "health-check",
+  users: {
+    listAll: "users-list-all",
+  },
 };

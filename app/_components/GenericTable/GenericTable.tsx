@@ -39,8 +39,6 @@ export function GenericTable<TData extends object>({
     getPaginationRowModel: getPaginationRowModel(),
   });
 
-  console.log("table", table.getRowModel().rows[0].getVisibleCells());
-
   return (
     <div className="p-4 w-full">
       {/* 🔍 Global Filter */}
