@@ -6,7 +6,7 @@ import Sidebar from "./SideBar";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="drawer lg:drawer-open h-screen w-full overflow-hidden bg-base-100">
+    <div className="drawer sm:drawer-open h-screen w-full overflow-hidden bg-base-100">
       <input id="dashboard-drawer" type="checkbox" className="drawer-toggle" />
 
       {/* Main content */}
@@ -18,7 +18,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       </div>
 
       {/* Sidebar */}
-      <div className="drawer-side">
+      <div className="drawer-side z-30">
         <label htmlFor="dashboard-drawer" className="drawer-overlay"></label>
         <Sidebar />
       </div>

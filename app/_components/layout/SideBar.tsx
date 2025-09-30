@@ -1,19 +1,9 @@
 "use client";
+import { navItems } from "@/app/_lib/constants/nav";
 import { permissions } from "@/app/_lib/constants/permissions";
 import { useAuthContext } from "@/app/_lib/context/AuthContext";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-
-const navItems = [
-  { label: "Dashboard", path: "/dashboard", resource: "dashboard" },
-  {
-    label: "Organizations",
-    path: "/dashboard/organizations",
-    resource: "organizations",
-  },
-  { label: "Users", path: "/dashboard/users", resource: "users" },
-  { label: "Devices", path: "/dashboard/devices", resource: "devices" },
-];
 
 export default function Sidebar() {
   const { user, logout } = useAuthContext();

@@ -1,6 +1,6 @@
 "use client";
 import { RoleProtectedPage } from "@/app/_components/RBAC/RoleProtectedPage";
-import { CurrentUserProfile } from "./components/CurrentUserProfile/CurrentUserProfile";
+import { CurrentUserProfile } from "./_components/CurrentUserProfile/CurrentUserProfile";
 import { SectionWrapper } from "@/app/_components/SectionWrapper/SectionWrapper";
 
 const DashboardPage = () => {

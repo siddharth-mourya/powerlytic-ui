@@ -4,7 +4,7 @@ export default function Header() {
   return (
     <header className="navbar bg-base-100 border-b border-base-200 shadow-sm px-4 sticky top-0 z-20">
       {/* Left side */}
-      <div className="flex-none lg:hidden">
+      <div className="flex-none sm:hidden">
         <label
           htmlFor="dashboard-drawer"
           className="btn btn-square btn-ghost"

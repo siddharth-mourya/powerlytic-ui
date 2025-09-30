@@ -12,6 +12,10 @@ export const permissions = {
     canView: [Roles.COMPANY_ADMIN, Roles.ORG_ADMIN] as Role[],
     canEdit: [Roles.COMPANY_ADMIN, Roles.ORG_ADMIN],
   },
+  portTypes: {
+    canView: [Roles.COMPANY_ADMIN, Roles.ORG_ADMIN, Roles.ORG_USER],
+    canEdit: [Roles.COMPANY_ADMIN],
+  },
   dashboard: {
     canView: [Roles.COMPANY_ADMIN, Roles.ORG_ADMIN, Roles.ORG_USER],
     canEdit: [Roles.COMPANY_ADMIN],

@@ -40,7 +40,7 @@ export function GenericTable<TData extends object>({
   });
 
   return (
-    <div className="p-4 w-full">
+    <div>
       {/* 🔍 Global Filter */}
       <div className="mb-4 flex justify-between items-center">
         <input

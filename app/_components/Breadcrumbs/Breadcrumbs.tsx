@@ -13,7 +13,7 @@ interface BreadcrumbsProps {
 const Breadcrumbs = ({ items }: BreadcrumbsProps) => {
   if (items.length <= 1) return null;
   return (
-    <div className="breadcrumbs text-sm p-4 ">
+    <div className="breadcrumbs text-sm pt-0 pb-4">
       <ul>
         {items.map((item, index) => (
           <li key={index} className="inline-flex items-center">

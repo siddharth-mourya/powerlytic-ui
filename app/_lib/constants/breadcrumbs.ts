@@ -10,4 +10,11 @@ export const BREADCRUMBS = [
       { label: "Users", path: "/dashboard/users" },
     ],
   },
+  {
+    route: "/dashboard/port-types",
+    items: [
+      { label: "Dashboard", path: "/dashboard" },
+      { label: "Port Types", path: "/dashboard/port-types" },
+    ],
+  },
 ];
