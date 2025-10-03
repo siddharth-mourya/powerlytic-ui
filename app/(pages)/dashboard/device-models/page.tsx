@@ -1,5 +1,5 @@
 import { RoleProtectedPage } from "@/app/_components/RBAC/RoleProtectedPage";
-import { DeviceModelList } from "./components/DeviceModelList";
+import { DeviceModelList } from "./_components/DeviceModelList";
 
 const DeviceModelPage = () => {
   return (

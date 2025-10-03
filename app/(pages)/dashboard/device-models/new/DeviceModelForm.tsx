@@ -23,8 +23,6 @@ export default function DeviceModelForm({
   const { fields, append, remove } = useFieldArray({ control, name: "ports" });
 
   const { data: portTypes } = usePortTypes();
-  // const portTypesOpti
-  console.log("---portype", portTypes);
 
   return (
     <form

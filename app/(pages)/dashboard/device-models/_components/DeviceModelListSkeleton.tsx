@@ -37,7 +37,6 @@ export default function DeviceModelListSkeleton() {
 
             <div className="card-actions justify-end mt-2 gap-2">
               <span className="btn btn-xs btn-outline w-16 h-6 opacity-50 cursor-not-allowed" />
-              <span className="btn btn-xs btn-primary w-16 h-6 opacity-50 cursor-not-allowed" />
             </div>
           </div>
         </div>

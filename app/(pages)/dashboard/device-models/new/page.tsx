@@ -1,6 +1,6 @@
 "use client";
 
-import DeviceModelForm from "../components/DeviceModelForm";
+import DeviceModelForm from "./DeviceModelForm";
 
 export default function NewDeviceModelPage() {
   const handleSubmit = async (data) => {

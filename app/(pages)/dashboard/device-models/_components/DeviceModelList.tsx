@@ -51,12 +51,6 @@ export function DeviceModelList() {
               >
                 <Eye className="w-3 h-3" /> View
               </a>
-              <a
-                href={`/dashboard/device-models/${model._id}/edit`}
-                className="btn btn-xs btn-primary flex items-center gap-1"
-              >
-                <Edit className="w-3 h-3" /> Edit
-              </a>
             </div>
           </div>
         </div>
