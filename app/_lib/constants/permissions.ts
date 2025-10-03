@@ -1,6 +1,6 @@
 import { Role, Roles } from "../types/roles.types";
 
-export type Action = "canView" | "canEdit" | "canAdd";
+export type Action = "canView" | "canEdit";
 
 export type PermissionConfig = {
   canView: string[];
@@ -20,6 +20,10 @@ export const permissions = {
     canView: [Roles.COMPANY_ADMIN, Roles.ORG_ADMIN, Roles.ORG_USER],
     canEdit: [Roles.COMPANY_ADMIN],
   },
+  deviceModels: {
+    canView: [Roles.COMPANY_ADMIN],
+    canEdit: [Roles.COMPANY_ADMIN],
+  },
   organizations: {
     canView: [Roles.COMPANY_ADMIN],
     canEdit: [Roles.COMPANY_ADMIN],
@@ -27,10 +31,6 @@ export const permissions = {
   devices: {
     canView: [Roles.COMPANY_ADMIN, Roles.ORG_ADMIN, Roles.ORG_USER],
     canEdit: [Roles.COMPANY_ADMIN, Roles.ORG_ADMIN],
-  },
-  deviceModel: {
-    canView: [Roles.COMPANY_ADMIN],
-    canEdit: [Roles.COMPANY_ADMIN],
   },
   deviceModelDetails: {
     canView: [Roles.COMPANY_ADMIN],

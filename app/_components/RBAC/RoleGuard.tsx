@@ -1,13 +1,16 @@
 "use client";
 
-import { PermissionConfig } from "@/app/_lib/constants/permissions";
+import {
+  PermissionConfig,
+  permissions,
+} from "@/app/_lib/constants/permissions";
 import { Role } from "@/app/_lib/types/roles.types";
 import { can } from "@/app/_lib/utils/permissions";
 import { ReactNode } from "react";
 
 type RoleGuardProps = {
   role: Role;
-  resource: "organizations" | "devices" | "users";
+  resource: keyof typeof permissions;
   action: keyof PermissionConfig;
   children: ReactNode;
   fallback?: ReactNode;

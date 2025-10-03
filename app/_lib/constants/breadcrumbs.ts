@@ -17,4 +17,11 @@ export const BREADCRUMBS = [
       { label: "Port Types", path: "/dashboard/port-types" },
     ],
   },
+  {
+    route: "/dashboard/device-models",
+    items: [
+      { label: "Dashboard", path: "/dashboard" },
+      { label: "Device Models", path: "/dashboard/device-models" },
+    ],
+  },
 ];

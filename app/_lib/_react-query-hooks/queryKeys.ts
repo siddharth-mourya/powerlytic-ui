@@ -11,4 +11,7 @@ export const queryKeys = {
   portTypes: {
     listAll: "port-types-list-all",
   },
+  deviceModels: {
+    listAll: "device-models-list-all",
+  },
 };
