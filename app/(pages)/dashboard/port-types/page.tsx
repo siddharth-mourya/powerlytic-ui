@@ -1,6 +1,5 @@
 import { RoleProtectedPage } from "@/app/_components/RBAC/RoleProtectedPage";
-import PortTypeManager from "./PortTypes";
-import DashboardLayout from "@/app/_components/layout/DashboardLayout";
+import PortTypeManager from "./components/PortTypes";
 
 const PortTypesPage = () => {
   return (

@@ -1,5 +1,6 @@
 // lib/api/axios.ts
 import axios from "axios";
+import { redirectToLogin } from "../utils/redirectHelper";
 
 export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -23,11 +24,21 @@ api.interceptors.request.use(
 );
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    return response;
+  },
   (error) => {
-    if (error.response?.status === 401) {
-      // TODO: handle logout or redirect
-      console.warn("Unauthorized! Redirecting...");
+    console.log(
+      "eeee",
+      error,
+      (error.request.responseUrl as string).includes("/api/auth/me")
+    );
+    // Redirect to login if any api returns in 401 and skip for auth/me api as it already redirect to login from Authenitcator and it would trigger a infite loop
+    if (
+      error.response?.status === 401 &&
+      !(error.request.responseUrl as string).includes("/api/auth/me")
+    ) {
+      redirectToLogin();
     }
     return Promise.reject(error);
   }

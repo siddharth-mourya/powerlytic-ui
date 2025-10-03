@@ -8,4 +8,7 @@ export const queryKeys = {
   users: {
     listAll: "users-list-all",
   },
+  portTypes: {
+    listAll: "port-types-list-all",
+  },
 };
