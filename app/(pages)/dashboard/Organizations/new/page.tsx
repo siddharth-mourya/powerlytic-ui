@@ -1,17 +1,17 @@
 "use client";
 
 import { RoleProtectedPage } from "@/app/_components/RBAC/RoleProtectedPage";
-import DeviceModelForm from "./DeviceModelForm";
+import OrganizationForm from "../_components/OrganizationForm";
 import Breadcrumbs from "@/app/_components/Breadcrumbs/Breadcrumbs";
 import { BREADCRUMBS } from "@/app/_lib/constants/breadcrumbs";
 import { PageContentHeader } from "@/app/_components/layout/PageContentHeader";
 
-export default function NewDeviceModelPage() {
+export default function NewOrganizationPage() {
   return (
-    <RoleProtectedPage resource="deviceModels" action="canEdit">
-      <Breadcrumbs items={BREADCRUMBS.newDeviceModels.items || []} />
-      <PageContentHeader title={"Device Model"} />
-      <DeviceModelForm />
+    <RoleProtectedPage resource="organizations" action="canEdit">
+      <Breadcrumbs items={BREADCRUMBS.organizationById.items || []} />
+      <PageContentHeader title={"Add Organization"} />
+      <OrganizationForm />
     </RoleProtectedPage>
   );
 }

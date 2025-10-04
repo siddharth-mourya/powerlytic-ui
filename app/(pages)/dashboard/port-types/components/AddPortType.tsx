@@ -18,11 +18,10 @@ import { useUpdatePortTypeMutation } from "@/app/_lib/_react-query-hooks/portTyp
 
 type FormDataType = Pick<
   IPortType,
-  "category" | "name" | "valueFormat" | "description" | "_id"
+  "category" | "name" | "valueFormat" | "description"
 >;
 
 const defaultValues: FormDataType = {
-  _id: "",
   name: "",
   category: "INPUT",
   valueFormat: "DIGITAL",
@@ -49,7 +48,7 @@ export function AddPortType({
 
   const onSubmit = async (data: FormDataType) => {
     if (editingId) {
-      updatePortType(data);
+      updatePortType({ _id: editingId, ...data });
       setEditingId(null);
     } else {
       createNewPortType(data);

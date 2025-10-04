@@ -12,8 +12,6 @@ export default function PortTypeManager() {
 
   return (
     <div>
-      <h2 className="text-2xl mb-5 font-bold">Port Types</h2>
-
       {/* Form Section */}
       <AddPortType editingPortTypeData={editingPortTypeData} />
 

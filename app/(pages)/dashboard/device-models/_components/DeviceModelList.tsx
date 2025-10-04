@@ -5,6 +5,7 @@ import { Clock, Cpu, Eye, Plug } from "lucide-react";
 import DeviceModelListSkeleton from "./DeviceModelListSkeleton";
 import { useRouter } from "next/navigation";
 import { MouseEvent } from "react";
+import Button from "@/app/_components/Button/Button";
 
 export const DeviceModelList = () => {
   const { data: deviceModels, isLoading } = useDeviceModelsListRQ();
@@ -15,56 +16,66 @@ export const DeviceModelList = () => {
     router.push(`/dashboard/device-models/${id}`);
   };
 
+  const handleNewClick = (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    router.push(`/dashboard/device-models/new`);
+  };
+
   if (isLoading) {
     return <DeviceModelListSkeleton />;
   }
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {deviceModels?.map((model) => (
-        <div
-          key={model._id}
-          className="card bg-base-100 border border-base-200 shadow-sm hover:shadow-lg transition"
-        >
-          <div className="card-body space-y-3">
-            {/* Header */}
-            <h2 className="card-title flex items-center gap-2 text-lg font-bold">
-              <Cpu className="w-5 h-5 text-primary" /> {model.name}
-            </h2>
-            <p className="text-sm text-gray-600 line-clamp-2">
-              {model.description || "No description available"}
-            </p>
+    <div className="flex flex-col gap-4">
+      <div className="self-end">
+        <Button onClick={handleNewClick}>Add New Model</Button>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {deviceModels?.map((model) => (
+          <div
+            key={model._id}
+            className="card bg-base-100 border border-base-200 shadow-sm hover:shadow-lg transition"
+          >
+            <div className="card-body space-y-3">
+              {/* Header */}
+              <h2 className="card-title flex items-center gap-2 text-lg font-bold">
+                <Cpu className="w-5 h-5 text-primary" /> {model.name}
+              </h2>
+              <p className="text-sm text-gray-600 line-clamp-2">
+                {model.description || "No description available"}
+              </p>
 
-            {/* Quick Info */}
-            <div className="space-y-2 text-sm">
-              <p className="flex items-center gap-1">
-                <Cpu className="w-4 h-4 text-gray-500" />
-                <span className="font-medium text-gray-700">MCU:</span>{" "}
-                {model.microControllerType}
-              </p>
-              <p className="flex items-center gap-1">
-                <Plug className="w-4 h-4 text-gray-500" />
-                <span className="font-medium text-gray-700">Ports:</span>{" "}
-                {model.ports.length}
-              </p>
-              <p className="flex items-center gap-1 text-gray-500 text-xs">
-                <Clock className="w-3 h-3" /> Updated:{" "}
-                {new Date(model.updatedAt).toLocaleDateString()}
-              </p>
-            </div>
+              {/* Quick Info */}
+              <div className="space-y-2 text-sm">
+                <p className="flex items-center gap-1">
+                  <Cpu className="w-4 h-4 text-gray-500" />
+                  <span className="font-medium text-gray-700">MCU:</span>{" "}
+                  {model.microControllerType}
+                </p>
+                <p className="flex items-center gap-1">
+                  <Plug className="w-4 h-4 text-gray-500" />
+                  <span className="font-medium text-gray-700">Ports:</span>{" "}
+                  {model.ports.length}
+                </p>
+                <p className="flex items-center gap-1 text-gray-500 text-xs">
+                  <Clock className="w-3 h-3" /> Updated:{" "}
+                  {new Date(model.updatedAt).toLocaleDateString()}
+                </p>
+              </div>
 
-            {/* Actions */}
-            <div className="card-actions justify-end mt-2 gap-2">
-              <a
-                onClick={(e) => handleViewClick(e, model._id)}
-                href={`/dashboard/device-models/${model._id}`}
-                className="btn btn-xs btn-outline flex items-center gap-1"
-              >
-                <Eye className="w-3 h-3" /> View
-              </a>
+              {/* Actions */}
+              <div className="card-actions justify-end mt-2 gap-2">
+                <a
+                  onClick={(e) => handleViewClick(e, model._id)}
+                  href={`/dashboard/device-models/${model._id}`}
+                  className="btn btn-xs btn-outline flex items-center gap-1"
+                >
+                  <Eye className="w-3 h-3" /> View
+                </a>
+              </div>
             </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };

@@ -21,11 +21,11 @@ export const permissions = {
     canEdit: [Roles.COMPANY_ADMIN],
   },
   deviceModels: {
-    canView: [Roles.COMPANY_ADMIN],
+    canView: [Roles.COMPANY_ADMIN, Roles.ORG_ADMIN, Roles.ORG_USER],
     canEdit: [Roles.COMPANY_ADMIN],
   },
   organizations: {
-    canView: [Roles.COMPANY_ADMIN],
+    canView: [Roles.COMPANY_ADMIN, Roles.ORG_ADMIN],
     canEdit: [Roles.COMPANY_ADMIN],
   },
   devices: {
