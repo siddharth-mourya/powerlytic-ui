@@ -1,19 +1,21 @@
 "use client";
-import { DeviceModel } from "@/app/_lib/_react-query-hooks/deviceModels/deviceModels.types";
+import {
+  DeviceModel,
+  NewDeviceModelParams,
+} from "@/app/_lib/_react-query-hooks/deviceModels/deviceModels.types";
 import { usePortTypes } from "@/app/_lib/_react-query-hooks/portTypes/portTypes";
 import { Cpu, Plug, Plus, Trash } from "lucide-react";
 import { useFieldArray, useForm } from "react-hook-form";
 
-interface IDeviceModelFormProps {
-  model?: DeviceModel;
-  onSubmit: (data: any) => Promise<void>;
+enum NewModelFormKeys {
+  NAME = "name",
+  DESCRIPTION = "description",
+  MICRO_CONTROLLER_TYPE = "microControllerType",
 }
-export default function DeviceModelForm({
-  model,
-  onSubmit,
-}: IDeviceModelFormProps) {
-  const { register, control, handleSubmit } = useForm({
-    defaultValues: model || {
+
+export default function DeviceModelForm() {
+  const { register, control, handleSubmit } = useForm<NewDeviceModelParams>({
+    defaultValues: {
       name: "",
       description: "",
       microControllerType: "",
@@ -24,6 +26,23 @@ export default function DeviceModelForm({
 
   const { data: portTypes } = usePortTypes();
 
+  const addNewPortField = () => {
+    append({
+      portNumber: `P${fields.length + 1}`,
+      portType: "",
+      microControllerPin: "",
+      description: "",
+    });
+  };
+
+  const onSubmit = async (data: NewDeviceModelParams) => {
+    try {
+      // redirect or toast success
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -33,7 +52,7 @@ export default function DeviceModelForm({
       <div>
         <label className="label">Name</label>
         <input
-          {...register("name")}
+          {...register(NewModelFormKeys.NAME)}
           className="input input-bordered w-full"
           placeholder="Device Name"
         />
@@ -43,7 +62,7 @@ export default function DeviceModelForm({
       <div>
         <label className="label">Description</label>
         <textarea
-          {...register("description")}
+          {...register(NewModelFormKeys.DESCRIPTION)}
           className="textarea textarea-bordered w-full"
           placeholder="Short description"
         />
@@ -53,7 +72,7 @@ export default function DeviceModelForm({
       <div className="flex items-center gap-2">
         <Cpu className="w-5 h-5 text-gray-500" />
         <input
-          {...register("microControllerType")}
+          {...register(NewModelFormKeys.MICRO_CONTROLLER_TYPE)}
           className="input input-bordered w-full"
           placeholder="Microcontroller Type"
         />
@@ -69,7 +88,8 @@ export default function DeviceModelForm({
             <input
               {...register(`ports.${index}.portNumber`)}
               placeholder="Port #"
-              className="input input-bordered w-24"
+              disabled
+              className="input input-bordered w-24 disabled"
             />
             <input
               {...register(`ports.${index}.microControllerPin`)}
@@ -77,7 +97,7 @@ export default function DeviceModelForm({
               className="input input-bordered w-24"
             />
             <select
-              {...register(`ports.${index}.portTypeId`)}
+              {...register(`ports.${index}.portType`)}
               className="select select-bordered"
             >
               {portTypes?.map((pt) => (
@@ -102,15 +122,7 @@ export default function DeviceModelForm({
         ))}
         <button
           type="button"
-          onClick={() =>
-            append({
-              _id: "",
-              portNumber: "",
-              portTypeId: { name: "", _id: "" },
-              microControllerPin: "",
-              description: "",
-            })
-          }
+          onClick={addNewPortField}
           className="btn btn-sm btn-outline flex items-center gap-1"
         >
           <Plus className="w-4 h-4" /> Add Port

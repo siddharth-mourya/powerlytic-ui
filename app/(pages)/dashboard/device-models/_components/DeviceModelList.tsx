@@ -1,11 +1,20 @@
 "use client";
 
-import { useListAllDeviceModelsRQ } from "@/app/_lib/_react-query-hooks/deviceModels/useListAllDeviceModels";
-import { Cpu, Plug, Clock, Edit, Eye } from "lucide-react";
+import { useDeviceModelsListRQ } from "@/app/_lib/_react-query-hooks/deviceModels/useDeviceModelsList";
+import { Clock, Cpu, Eye, Plug } from "lucide-react";
 import DeviceModelListSkeleton from "./DeviceModelListSkeleton";
+import { useRouter } from "next/navigation";
+import { MouseEvent } from "react";
 
-export function DeviceModelList() {
-  const { data: deviceModels, isLoading } = useListAllDeviceModelsRQ();
+export const DeviceModelList = () => {
+  const { data: deviceModels, isLoading } = useDeviceModelsListRQ();
+
+  const router = useRouter();
+  const handleViewClick = (e: MouseEvent<HTMLAnchorElement>, id: string) => {
+    e.preventDefault();
+    router.push(`/dashboard/device-models/${id}`);
+  };
+
   if (isLoading) {
     return <DeviceModelListSkeleton />;
   }
@@ -46,6 +55,7 @@ export function DeviceModelList() {
             {/* Actions */}
             <div className="card-actions justify-end mt-2 gap-2">
               <a
+                onClick={(e) => handleViewClick(e, model._id)}
                 href={`/dashboard/device-models/${model._id}`}
                 className="btn btn-xs btn-outline flex items-center gap-1"
               >
@@ -57,4 +67,4 @@ export function DeviceModelList() {
       ))}
     </div>
   );
-}
+};

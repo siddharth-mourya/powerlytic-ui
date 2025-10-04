@@ -60,7 +60,7 @@ export default function DeviceModelDetails() {
               {deviceModel?.ports.map((port) => (
                 <tr key={port._id}>
                   <td>{port.portNumber}</td>
-                  <td>{port.portTypeId?.name}</td>
+                  <td>{port.portType?.name}</td>
                   <td>{port.microControllerPin}</td>
                   <td>{port.description || "-"}</td>
                 </tr>

@@ -15,7 +15,7 @@ export const useDeviceModelDetailsRQ = (id: string) => {
   };
 
   return useQuery<DeviceModel>({
-    queryKey: [queryKeys.deviceModels.listAll],
+    queryKey: [queryKeys.deviceModels.specificDevice, id],
     queryFn: getDeviceModelsDetails,
     staleTime: 1000 * 60 * 5,
     retry: 1,

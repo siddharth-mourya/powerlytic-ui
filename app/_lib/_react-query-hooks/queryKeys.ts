@@ -13,5 +13,6 @@ export const queryKeys = {
   },
   deviceModels: {
     listAll: "device-models-list-all",
+    specificDevice: "specific device",
   },
 };
