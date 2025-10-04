@@ -1,11 +1,8 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-import { jwtDecode } from "jwt-decode";
 import { api } from "@/app/_lib/api/axios";
-import { useAuthStore } from "../../stores/useAuthStore";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Role } from "../../types/roles.types";
-import { User } from "./useCurrentLoggedinUserRQ";
 import { queryKeys } from "../queryKeys";
+import { User } from "./useCurrentLoggedinUserRQ";
 
 export interface DecodedToken {
   userId: string;
@@ -28,7 +25,6 @@ interface LoginRequest {
 }
 
 export const useLoginMutation = () => {
-  const router = useRouter();
   const queryClient = useQueryClient();
 
   const mutationFn = (params: LoginRequest): Promise<LoginResponse> => {

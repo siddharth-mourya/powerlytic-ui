@@ -30,6 +30,7 @@ export interface OrganizationDevice {
   _id: string;
   name: string;
   imei: string;
+  isActive: string;
   deviceModelId: string;
   createdAt: string;
   updatedAt: string;

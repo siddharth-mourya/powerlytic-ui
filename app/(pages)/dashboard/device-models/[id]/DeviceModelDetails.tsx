@@ -1,7 +1,7 @@
 "use client";
 
 import { useDeviceModelDetailsRQ } from "@/app/_lib/_react-query-hooks/deviceModels/useDeviceModelDetailsRQ";
-import { Cpu, Plug, Clock, Edit, Eye } from "lucide-react";
+import { Clock, Cpu, Plug } from "lucide-react";
 import { useParams } from "next/navigation";
 import DeviceModelDetailsSkeleton from "./DeviceModelDetailsSkeleton";
 

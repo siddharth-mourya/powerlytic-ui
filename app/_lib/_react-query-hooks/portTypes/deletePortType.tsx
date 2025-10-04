@@ -18,10 +18,10 @@ export const useDeletePortTypeMutation = () => {
   return useMutation<IPortType, Error, DeleteRequestType>({
     mutationFn: mutationFn,
     retry: 1,
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast(`Port type is deleted successfully`);
     },
-    onError: (error) => {
+    onError: () => {
       toast.error(`Failed to delete the port type`);
     },
     onSettled: () => {

@@ -2,15 +2,21 @@
 
 import Button from "@/app/_components/Button/Button";
 import { GenericTable } from "@/app/_components/GenericTable/GenericTable";
+import { Organization } from "@/app/_lib/_react-query-hooks/organizations/organizations.types";
 import { useOrganizationsRQ } from "@/app/_lib/_react-query-hooks/organizations/useOrganizationsRQ";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 
-type Organization = {
-  _id: string;
-  name: string;
-  description?: string;
-  createdAt: string;
+type TableOrganization = Pick<
+  Organization,
+  "_id" | "name" | "orgEmail" | "orgPhone" | "isActive" | "createdAt"
+>;
+
+type TableColumn = {
+  header: string;
+  accessorKey?: keyof TableOrganization;
+  cell?: (props: {
+    row: { original: TableOrganization };
+  }) => React.ReactElement | string;
 };
 
 export function OrganizationList() {
@@ -21,16 +27,16 @@ export function OrganizationList() {
     organizations?.map((org) => ({
       _id: org._id,
       name: org.name,
-      email: org.orgEmail,
-      phone: org.orgPhone,
+      orgEmail: org.orgEmail,
+      orgPhone: org.orgPhone,
       createdAt: org.createdAt,
       isActive: org.isActive,
     })) || [];
 
-  const columns = [
+  const columns: TableColumn[] = [
     {
       header: "Name",
-      cell: ({ row }: any) => {
+      cell: ({ row }) => {
         return (
           <a
             href={`/dashboard/organizations/${row.original._id}`}
@@ -44,18 +50,17 @@ export function OrganizationList() {
         );
       },
     },
-    { header: "Email", accessorKey: "email" },
-    { header: "Phone", accessorKey: "phone" },
+    { header: "Email", accessorKey: "orgEmail" },
+    { header: "Phone", accessorKey: "orgPhone" },
     { header: "Status", accessorKey: "isActive" },
     {
       header: "Created",
       accessorKey: "createdAt",
-      cell: ({ row }: any) =>
-        new Date(row.original.createdAt).toLocaleDateString(),
+      cell: ({ row }) => new Date(row.original.createdAt).toLocaleDateString(),
     },
     {
       header: "Actions",
-      cell: ({ row }: any) => (
+      cell: ({ row }) => (
         <Button
           variant="outline"
           size="sm"

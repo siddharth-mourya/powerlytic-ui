@@ -29,7 +29,7 @@ export const useUpdatePortTypeMutation = () => {
     onSuccess: (data) => {
       toast(`${data.name} with ${data.category} is updated successfully`);
     },
-    onError: (error) => {
+    onError: () => {
       toast.error(`Failed to update the port type`);
     },
     onSettled: () => {

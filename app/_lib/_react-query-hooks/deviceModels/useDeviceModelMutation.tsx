@@ -20,7 +20,7 @@ export const useDeviceModelMutation = () => {
       toast(`Device ${data.name} added successfully`);
       router.push("/dashboard/device-models");
     },
-    onError: (error) => {
+    onError: () => {
       toast.error("Failed to add device");
     },
     onSettled: () => {

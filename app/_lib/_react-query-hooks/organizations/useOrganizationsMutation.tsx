@@ -20,7 +20,7 @@ export const useOrganizationsMutation = () => {
       toast(`organizations ${data.name} added successfully`);
       router.push("/dashboard/organizations");
     },
-    onError: (error) => {
+    onError: () => {
       toast.error("Failed to add organization");
     },
     onSettled: () => {

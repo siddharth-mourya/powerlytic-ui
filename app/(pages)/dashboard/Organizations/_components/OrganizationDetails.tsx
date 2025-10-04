@@ -1,21 +1,34 @@
 "use client";
 
 import Button from "@/app/_components/Button/Button";
-import { GenericTable } from "@/app/_components/GenericTable/GenericTable";
+import {
+  GenericTable,
+  TableColumn,
+} from "@/app/_components/GenericTable/GenericTable";
+import {
+  OrganizationDevice,
+  OrganizationUser,
+} from "@/app/_lib/_react-query-hooks/organizations/organizations.types";
 import { useOrganizationByIdRQ } from "@/app/_lib/_react-query-hooks/organizations/useOrganizationByIdRQ";
 import {
   Box,
+  CheckCircle,
+  Clock,
   Hash,
   Mail,
   MapPin,
   Pencil,
   Phone,
   Users,
-  CheckCircle,
-  Clock,
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { ColumnDef } from "@tanstack/react-table";
+
+type UserTable = Pick<
+  OrganizationUser,
+  "name" | "email" | "phone" | "isActive" | "role"
+>;
+
+type DeviceTable = Pick<OrganizationDevice, "imei" | "name" | "isActive">;
 
 export function OrganizationDetails() {
   const { orgId } = useParams<{ orgId: string }>();
@@ -30,7 +43,7 @@ export function OrganizationDetails() {
   const { organization, users, devices } = data || {};
 
   // ---- Table column defs ----
-  const userColumns: ColumnDef<any>[] = [
+  const userColumns: TableColumn<UserTable>[] = [
     { accessorKey: "name", header: "Name" },
     { accessorKey: "email", header: "Email" },
     {
@@ -62,7 +75,7 @@ export function OrganizationDetails() {
     },
   ];
 
-  const deviceColumns: ColumnDef<any>[] = [
+  const deviceColumns: TableColumn<DeviceTable>[] = [
     { accessorKey: "name", header: "Name" },
     { accessorKey: "imei", header: "IMEI" },
     {

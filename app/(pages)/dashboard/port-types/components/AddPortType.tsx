@@ -61,7 +61,7 @@ export function AddPortType({
     if (editingPortTypeData) {
       reset(editingPortTypeData);
     }
-  }, [editingPortTypeData]);
+  }, [editingPortTypeData, reset]);
 
   const handleCancel = () => {
     setEditingId(null);

@@ -1,11 +1,9 @@
 "use client";
 import { api } from "@/app/_lib/api/axios";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 import { queryKeys } from "../queryKeys";
 
 export const useLogoutMutation = () => {
-  const router = useRouter();
   const queryClient = useQueryClient();
 
   const mutationFn = ({ refreshToken }: { refreshToken: string }) => {

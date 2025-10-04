@@ -1,9 +1,7 @@
+import { api } from "@/app/_lib/api/axios";
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "../queryKeys";
-import { api } from "@/app/_lib/api/axios";
 import { OrganizationByIdResponse } from "./organizations.types";
-
-export interface OrganizationDetails {}
 
 export const useOrganizationByIdRQ = (id: string) => {
   const getOrganizationDetails = async () => {

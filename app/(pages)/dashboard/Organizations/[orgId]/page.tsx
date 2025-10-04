@@ -1,10 +1,9 @@
 "use client";
 
-import { RoleProtectedPage } from "@/app/_components/RBAC/RoleProtectedPage";
-import { OrganizationDetails } from "../_components/OrganizationDetails";
 import Breadcrumbs from "@/app/_components/Breadcrumbs/Breadcrumbs";
+import { RoleProtectedPage } from "@/app/_components/RBAC/RoleProtectedPage";
 import { BREADCRUMBS } from "@/app/_lib/constants/breadcrumbs";
-import { PageContentHeader } from "@/app/_components/layout/PageContentHeader";
+import { OrganizationDetails } from "../_components/OrganizationDetails";
 
 export default function OrganizationDetailsPage() {
   return (

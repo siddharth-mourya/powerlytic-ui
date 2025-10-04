@@ -14,8 +14,14 @@ import { useState } from "react";
 
 type GenericTableProps<TData extends object> = {
   data: TData[];
-  columns: ColumnDef<TData, any>[];
+  columns: ColumnDef<TData, unknown>[];
 };
+
+export interface TableColumn<TData> {
+  header: string;
+  accessorKey?: keyof TData;
+  cell?: (props: { row: { original: TData } }) => React.ReactElement | string;
+}
 
 export function GenericTable<TData extends object>({
   data,

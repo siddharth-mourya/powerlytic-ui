@@ -1,6 +1,4 @@
-import React from "react";
-
-export const DevicesPage: React.FC = () => {
+const DevicesPage = () => {
   return (
     <div>
       <h1>Devices Page</h1>
@@ -8,3 +6,5 @@ export const DevicesPage: React.FC = () => {
     </div>
   );
 };
+
+export default DevicesPage;

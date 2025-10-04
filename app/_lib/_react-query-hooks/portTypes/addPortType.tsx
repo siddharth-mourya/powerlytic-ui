@@ -24,7 +24,7 @@ export const useCreatePortTypeMutation = () => {
     onSuccess: (data) => {
       toast(`${data.name} with ${data.category} is created successfully`);
     },
-    onError: (error) => {
+    onError: () => {
       toast.error(`Failed to create the port type`);
     },
     onSettled: () => {
