@@ -1,11 +1,10 @@
 "use client";
-import {
-  DeviceModel,
-  NewDeviceModelParams,
-} from "@/app/_lib/_react-query-hooks/deviceModels/deviceModels.types";
+import { NewDeviceModelParams } from "@/app/_lib/_react-query-hooks/deviceModels/deviceModels.types";
 import { usePortTypes } from "@/app/_lib/_react-query-hooks/portTypes/portTypes";
 import { Cpu, Plug, Plus, Trash } from "lucide-react";
 import { useFieldArray, useForm } from "react-hook-form";
+import { useEffect } from "react";
+import { useDeviceModelMutation } from "@/app/_lib/_react-query-hooks/deviceModels/useDeviceModelMutation";
 
 enum NewModelFormKeys {
   NAME = "name",
@@ -14,17 +13,35 @@ enum NewModelFormKeys {
 }
 
 export default function DeviceModelForm() {
-  const { register, control, handleSubmit } = useForm<NewDeviceModelParams>({
-    defaultValues: {
-      name: "",
-      description: "",
-      microControllerType: "",
-      ports: [],
-    },
-  });
-  const { fields, append, remove } = useFieldArray({ control, name: "ports" });
+  const { mutate: addNewDeviceModel } = useDeviceModelMutation();
+  const { register, control, handleSubmit, setValue } =
+    useForm<NewDeviceModelParams>({
+      defaultValues: {
+        name: "",
+        description: "",
+        microControllerType: "",
+        ports: [
+          {
+            portNumber: "P1",
+            portType: "",
+            microControllerPin: "",
+            description: "",
+          },
+        ], // ensure at least one port on mount
+      },
+    });
 
+  const { fields, append, remove } = useFieldArray({ control, name: "ports" });
   const { data: portTypes } = usePortTypes();
+
+  // Auto update portNumber when fields change
+  useEffect(() => {
+    fields.forEach((_, index) => {
+      setValue(`ports.${index}.portNumber`, `P${index + 1}`, {
+        shouldValidate: true,
+      });
+    });
+  }, [fields, setValue]);
 
   const addNewPortField = () => {
     append({
@@ -35,9 +52,15 @@ export default function DeviceModelForm() {
     });
   };
 
+  const removePortField = (index: number) => {
+    if (fields.length === 1) return; // prevent removing last port
+    remove(index);
+  };
+
   const onSubmit = async (data: NewDeviceModelParams) => {
     try {
-      // redirect or toast success
+      console.log("Submitting device model", data);
+      addNewDeviceModel(data);
     } catch (err) {
       console.error(err);
     }
@@ -52,7 +75,7 @@ export default function DeviceModelForm() {
       <div>
         <label className="label">Name</label>
         <input
-          {...register(NewModelFormKeys.NAME)}
+          {...register(NewModelFormKeys.NAME, { required: true })}
           className="input input-bordered w-full"
           placeholder="Device Name"
         />
@@ -62,7 +85,7 @@ export default function DeviceModelForm() {
       <div>
         <label className="label">Description</label>
         <textarea
-          {...register(NewModelFormKeys.DESCRIPTION)}
+          {...register(NewModelFormKeys.DESCRIPTION, { required: true })}
           className="textarea textarea-bordered w-full"
           placeholder="Short description"
         />
@@ -72,7 +95,9 @@ export default function DeviceModelForm() {
       <div className="flex items-center gap-2">
         <Cpu className="w-5 h-5 text-gray-500" />
         <input
-          {...register(NewModelFormKeys.MICRO_CONTROLLER_TYPE)}
+          {...register(NewModelFormKeys.MICRO_CONTROLLER_TYPE, {
+            required: true,
+          })}
           className="input input-bordered w-full"
           placeholder="Microcontroller Type"
         />
@@ -85,21 +110,24 @@ export default function DeviceModelForm() {
         </label>
         {fields.map((field, index) => (
           <div key={field.id} className="flex gap-2 mb-2 items-center">
+            {/* Auto-generated port number */}
             <input
               {...register(`ports.${index}.portNumber`)}
-              placeholder="Port #"
               disabled
-              className="input input-bordered w-24 disabled"
+              className="input input-bordered w-20 disabled"
             />
             <input
-              {...register(`ports.${index}.microControllerPin`)}
+              {...register(`ports.${index}.microControllerPin`, {
+                required: true,
+              })}
               placeholder="Pin"
               className="input input-bordered w-24"
             />
             <select
-              {...register(`ports.${index}.portType`)}
+              {...register(`ports.${index}.portType`, { required: true })}
               className="select select-bordered"
             >
+              <option value="">Select type</option>
               {portTypes?.map((pt) => (
                 <option key={pt._id} value={pt._id}>
                   {pt.category} - {pt.valueFormat}
@@ -113,8 +141,9 @@ export default function DeviceModelForm() {
             />
             <button
               type="button"
-              onClick={() => remove(index)}
+              onClick={() => removePortField(index)}
               className="btn btn-xs btn-error"
+              disabled={fields.length === 1} // prevent removing last port
             >
               <Trash className="w-3 h-3" />
             </button>
