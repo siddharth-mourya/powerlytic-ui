@@ -53,7 +53,7 @@ export default function DeviceModelForm() {
   };
 
   const removePortField = (index: number) => {
-    if (fields.length === 1) return; // prevent removing last port
+    if (fields.length === 1) return;
     remove(index);
   };
 
