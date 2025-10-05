@@ -19,4 +19,9 @@ export const queryKeys = {
     listAll: "organization-list-all",
     specificOrg: "specific-org",
   },
+  devices: {
+    listAll: "devices-list-all",
+    listAllByOrgId: "devices-list-all-by-org",
+    byId: "device-by-id",
+  },
 };

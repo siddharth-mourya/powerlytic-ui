@@ -5,7 +5,6 @@ import { OrganizationByIdResponse } from "./organizations.types";
 
 export const useOrganizationByIdRQ = (id: string) => {
   const getOrganizationDetails = async () => {
-    console.log("getting organization details by id", id);
     if (id) {
       const res = await api.get(`/organizations/${id}`);
 

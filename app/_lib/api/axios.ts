@@ -28,11 +28,6 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    console.log(
-      "eeee",
-      error,
-      (error.request.responseUrl as string).includes("/api/auth/me")
-    );
     // Redirect to login if any api returns in 401 and skip for auth/me api as it already redirect to login from Authenitcator and it would trigger a infite loop
     if (
       error.response?.status === 401 &&

@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "../queryKeys";
 import { api } from "@/app/_lib/api/axios";
-import { Role } from "../../types/roles.types";
+import { Role } from "../../utils/rbac/roles";
 
 export interface User {
   _id: string;

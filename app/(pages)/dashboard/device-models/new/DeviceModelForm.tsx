@@ -59,7 +59,6 @@ export default function DeviceModelForm() {
 
   const onSubmit = async (data: NewDeviceModelParams) => {
     try {
-      console.log("Submitting device model", data);
       addNewDeviceModel(data);
     } catch (err) {
       console.error(err);

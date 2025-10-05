@@ -40,6 +40,8 @@ export const BREADCRUMBS = {
       { label: "Add Device Model", path: "/dashboard/device-models/new" },
     ],
   },
+
+  //Organizations
   organizations: {
     route: "/dashboard/organizations",
     items: [
@@ -53,6 +55,31 @@ export const BREADCRUMBS = {
       { label: "Dashboard", path: "/dashboard" },
       { label: "Organizations", path: "/dashboard/organizations" },
       { label: "Organization Details", path: "" },
+    ],
+  },
+
+  //Devices
+  devices: {
+    route: "/dashboard/devices",
+    items: [
+      { label: "Dashboard", path: "/dashboard" },
+      { label: "Devices", path: "/dashboard/devices" },
+    ],
+  },
+  deviceById: {
+    route: "/dashboard/device-models/:id",
+    items: [
+      { label: "Dashboard", path: "/dashboard" },
+      { label: "Device", path: "/dashboard/devices" },
+      { label: "Device Details", path: "" },
+    ],
+  },
+  newDevice: {
+    route: "/dashboard/devices/new",
+    items: [
+      { label: "Dashboard", path: "/dashboard" },
+      { label: "Devices", path: "/dashboard/device" },
+      { label: "Add Device", path: "/dashboard/device/new" },
     ],
   },
 };

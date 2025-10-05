@@ -1,7 +1,8 @@
 "use client";
 import { navItems } from "@/app/_lib/constants/nav";
-import { permissions } from "@/app/_lib/constants/permissions";
 import { useAuthContext } from "@/app/_lib/context/AuthContext";
+import { can } from "@/app/_lib/utils/rbac/can";
+import { Actions } from "@/app/_lib/utils/rbac/resources";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -16,9 +17,7 @@ export default function Sidebar() {
   };
 
   const navsToShow = navItems.filter((item) => {
-    const canViewForResource =
-      permissions[item.resource as keyof typeof permissions]?.canView || [];
-    return canViewForResource.includes(user.role);
+    return can(user.role, item.resource, Actions.VIEW);
   });
 
   return (

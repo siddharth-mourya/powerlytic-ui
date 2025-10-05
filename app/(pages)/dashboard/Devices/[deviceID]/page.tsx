@@ -1,9 +1,19 @@
+"use client";
+import Breadcrumbs from "@/app/_components/Breadcrumbs/Breadcrumbs";
+import { PageContentHeader } from "@/app/_components/layout/PageContentHeader";
+import { BREADCRUMBS } from "@/app/_lib/constants/breadcrumbs";
+import { Actions, Resources } from "@/app/_lib/utils/rbac/resources";
+import { RoleProtectedGuard } from "@/app/_lib/utils/rbac/RoleProtectedGuard";
+import { useParams } from "next/navigation";
+import { DeviceDetails } from "./DeviceDetails";
+
 const DevicesByIDPage = () => {
+  const { deviceId } = useParams();
   return (
-    <div>
-      <h1>Devices Page</h1>
-      <p>This is the Devices page.</p>
-    </div>
+    <RoleProtectedGuard resource={Resources.DEVICES} action={Actions.VIEW}>
+      <Breadcrumbs items={BREADCRUMBS.deviceById.items || []} />
+      <DeviceDetails deviceId={(deviceId as string) || ""} />
+    </RoleProtectedGuard>
   );
 };
 

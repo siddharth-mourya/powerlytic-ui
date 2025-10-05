@@ -4,6 +4,7 @@ import Button from "@/app/_components/Button/Button";
 import { GenericTable } from "@/app/_components/GenericTable/GenericTable";
 import { Organization } from "@/app/_lib/_react-query-hooks/organizations/organizations.types";
 import { useOrganizationsRQ } from "@/app/_lib/_react-query-hooks/organizations/useOrganizationsRQ";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 type TableOrganization = Pick<
@@ -38,15 +39,16 @@ export function OrganizationList() {
       header: "Name",
       cell: ({ row }) => {
         return (
-          <a
+          <Link
             href={`/dashboard/organizations/${row.original._id}`}
             className="link link-info"
-            onClick={() =>
-              router.push(`/dashboard/organizations/${row.original._id}`)
-            }
+            onClick={(e) => {
+              e.preventDefault();
+              router.push(`/dashboard/organizations/${row.original._id}`);
+            }}
           >
             {row.original.name}
-          </a>
+          </Link>
         );
       },
     },

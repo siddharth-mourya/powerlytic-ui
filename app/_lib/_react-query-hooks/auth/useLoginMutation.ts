@@ -1,6 +1,6 @@
 import { api } from "@/app/_lib/api/axios";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Role } from "../../types/roles.types";
+import { Role } from "../../utils/rbac/roles";
 import { queryKeys } from "../queryKeys";
 import { User } from "./useCurrentLoggedinUserRQ";
 
