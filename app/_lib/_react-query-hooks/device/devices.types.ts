@@ -90,12 +90,15 @@ export interface CreateDeviceDTO {
   organizationId?: string;
 }
 
-export interface UpdateDeviceDTO {
-  name?: string;
-  status?: "online" | "offline" | "maintenance";
-  metadata?: Record<string, any>;
-  organizationId?: string;
-}
+export type UpdateDeviceDTO = Omit<
+  Device,
+  | "_id"
+  | "imei"
+  | "deviceModelId"
+  | "createdAt"
+  | "updatedAt"
+  | "manufacturingYear"
+>;
 
 // -----------------------------
 // 🔹 API Responses

@@ -1,7 +1,7 @@
 import { api } from "@/app/_lib/api/axios";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "../queryKeys";
-import { Device } from "./devices.types";
+import { Device, UpdateDeviceDTO } from "./devices.types";
 
 // -----------------------------
 // 🔹 List All Devices
@@ -93,12 +93,6 @@ export const useCreateDeviceMutation = () => {
 // -----------------------------
 // 🔹 Update Device
 // -----------------------------
-export interface UpdateDeviceDTO {
-  name?: string;
-  status?: "online" | "offline" | "maintenance";
-  organizationId?: string;
-  metadata?: Record<string, any>;
-}
 
 export const useUpdateDeviceMutation = (id: string) => {
   const queryClient = useQueryClient();
