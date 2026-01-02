@@ -13,25 +13,51 @@ import { Card, CardContent } from "@/app/_components/Card/Card";
 import { TextInput } from "@/app/_components/Inputs/TextInput";
 import { TextArea } from "@/app/_components/Inputs/Textarea";
 import Button from "@/app/_components/Button/Button";
-import { UpdateDeviceDTO } from "@/app/_lib/_react-query-hooks/device/devices.types";
 
 interface EditDeviceFormProps {
   deviceId: string;
+}
+
+interface DeviceFormValues {
+  name: string;
+  status: string;
+  pointOfContact: string;
+  alertEmails: string[];
+  alertPhones: string[];
+  metadata: Record<string, string | undefined>;
+  location: {
+    lat: number;
+    lng: number;
+    address: string;
+  };
+  ports: Array<{
+    status: string;
+    unit: string;
+    calibrationValue: {
+      scaling: number;
+      offset: number;
+    };
+    thresholds: {
+      min: number;
+      max: number;
+      message: string;
+    };
+  }>;
 }
 
 export function EditDeviceForm({ deviceId }: EditDeviceFormProps) {
   const { data: device, isLoading } = useDeviceByIdRQ(deviceId);
   const updateDevice = useUpdateDeviceMutation(deviceId);
 
-  const form = useForm({
+  const form = useForm<DeviceFormValues>({
     defaultValues: {
       name: "",
       status: "offline",
       pointOfContact: "",
-      alertEmails: [""],
-      alertPhones: [""],
+      alertEmails: [],
+      alertPhones: [],
       metadata: {},
-      location: { lat: "", lng: "", address: "" },
+      location: { lat: NaN, lng: NaN, address: "" },
       ports: [],
     },
   });
@@ -50,6 +76,7 @@ export function EditDeviceForm({ deviceId }: EditDeviceFormProps) {
     remove: removeEmail,
   } = useFieldArray({
     control,
+    // @ts-expect-error: react-hook-form string[] field array type inference limitation
     name: "alertEmails",
   });
 
@@ -59,6 +86,7 @@ export function EditDeviceForm({ deviceId }: EditDeviceFormProps) {
     remove: removePhone,
   } = useFieldArray({
     control,
+    // @ts-expect-error: react-hook-form string[] field array type inference limitation
     name: "alertPhones",
   });
 
@@ -70,14 +98,14 @@ export function EditDeviceForm({ deviceId }: EditDeviceFormProps) {
         pointOfContact: device.pointOfContact || "",
         alertEmails: device.alertEmails || [""],
         alertPhones: device.alertPhones || [""],
-        metadata: device.metadata || {},
-        location: device.location || { lat: "", lng: "", address: "" },
+        metadata: (device.metadata as Record<string, string | undefined>) || {},
+        location: device.location || { lat: NaN, lng: NaN, address: "" },
         ports: device.ports || [],
       });
     }
   }, [device, reset]);
 
-  const onSubmit = (values: unknown) => {
+  const onSubmit = () => {
     // updateDevice.mutate(values as UpdateDeviceDTO);
   };
 
@@ -264,7 +292,7 @@ export function EditDeviceForm({ deviceId }: EditDeviceFormProps) {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => appendEmail("")}
+                  onClick={() => (appendEmail as (val: unknown) => void)("")}
                 >
                   + Add Email
                 </Button>
@@ -291,7 +319,7 @@ export function EditDeviceForm({ deviceId }: EditDeviceFormProps) {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => appendPhone("")}
+                  onClick={() => (appendPhone as (val: unknown) => void)("")}
                 >
                   + Add Phone
                 </Button>
