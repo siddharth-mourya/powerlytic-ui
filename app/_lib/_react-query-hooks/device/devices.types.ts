@@ -67,7 +67,7 @@ export interface Device {
     lng?: number;
     address?: string;
   };
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   ports: Port[];
   pointOfContact?: string;
   alertEmails?: string[];
@@ -86,7 +86,7 @@ export interface CreateDeviceDTO {
   name: string;
   imei: string;
   deviceModelId: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   organizationId?: string;
 }
 

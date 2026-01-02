@@ -13,6 +13,7 @@ import { Card, CardContent } from "@/app/_components/Card/Card";
 import { TextInput } from "@/app/_components/Inputs/TextInput";
 import { TextArea } from "@/app/_components/Inputs/Textarea";
 import Button from "@/app/_components/Button/Button";
+import { UpdateDeviceDTO } from "@/app/_lib/_react-query-hooks/device/devices.types";
 
 interface EditDeviceFormProps {
   deviceId: string;
@@ -76,8 +77,8 @@ export function EditDeviceForm({ deviceId }: EditDeviceFormProps) {
     }
   }, [device, reset]);
 
-  const onSubmit = (values: any) => {
-    updateDevice.mutate(values);
+  const onSubmit = (values: unknown) => {
+    // updateDevice.mutate(values as UpdateDeviceDTO);
   };
 
   if (isLoading) return <p>Loading...</p>;

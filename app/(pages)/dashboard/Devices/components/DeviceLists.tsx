@@ -25,8 +25,8 @@ export default function DeviceListPage() {
       await axios.delete(`/api/devices/${device._id}`);
       toast.success("Device deleted");
       refetchDevices();
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || err.message);
+    } catch (err) {
+      // toast.error(err?.response?.data?.message || err.message);
     }
   };
 

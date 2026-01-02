@@ -1,6 +1,5 @@
 "use client";
 import Breadcrumbs from "@/app/_components/Breadcrumbs/Breadcrumbs";
-import { PageContentHeader } from "@/app/_components/layout/PageContentHeader";
 import { BREADCRUMBS } from "@/app/_lib/constants/breadcrumbs";
 import { Actions, Resources } from "@/app/_lib/utils/rbac/resources";
 import { RoleProtectedGuard } from "@/app/_lib/utils/rbac/RoleProtectedGuard";

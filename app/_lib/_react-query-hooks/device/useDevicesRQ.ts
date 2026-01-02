@@ -66,7 +66,7 @@ export interface CreateDeviceDTO {
   name: string;
   imei: string;
   deviceModelId: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export const useCreateDeviceMutation = () => {

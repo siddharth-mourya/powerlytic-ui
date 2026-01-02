@@ -30,7 +30,7 @@ export function PortTypesList({
       {portTypes?.map((pt) => (
         <div
           key={pt._id}
-          className="flex flex-col gap-4 items md:flex-row md:items-center  justify-between p-3 bg-base-100 rounded-lg border border-base-200 shadow-sm hover:shadow-md transition"
+          className="flex flex-col gap-4 items md:flex-row md:items-center justify-between p-3 bg-base-100 rounded-lg border border-base-200 shadow-sm hover:shadow-md transition"
         >
           {/* Left */}
           <div className="flex flex-col">
