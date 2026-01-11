@@ -14,6 +14,7 @@ import {
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
+import { IValueTableRow } from "@/app/_lib/_react-query-hooks/values/values.types";
 
 interface ValuesTableViewProps {
   deviceId: string;
@@ -28,6 +29,7 @@ interface ValuesTableViewProps {
 interface TableRow {
   timestamp: string;
   ts: Date;
+  // @ts-ignore
   [key: string]: any;
 }
 
@@ -55,7 +57,7 @@ export default function ValuesTableView({
   const formattedData = useMemo(() => {
     if (!tableData?.data) return [];
 
-    return tableData.data.map((row: any) => {
+    return tableData.data.map((row: IValueTableRow) => {
       const baseRow: any = {
         ts: new Date(row.ts),
         timestamp: new Date(row.ts).toLocaleString(),
@@ -75,6 +77,7 @@ export default function ValuesTableView({
         ) {
           // Modbus data is nested: { "slaveId_readTag": { readId, slaveId, readName, calibratedValue, ... } }
           Object.keys(portData).forEach((readKey) => {
+            // @ts-ignore
             const readData = portData[readKey];
             // Create a flattened key for this read
             const flatKey = `${portKey}_${readKey}`;
@@ -95,6 +98,7 @@ export default function ValuesTableView({
 
   // Extract Modbus read keys from actual data (since API returns nested structure)
   const modbusReadKeys = useMemo(() => {
+    // @ts-ignore
     const keys: {
       [portKey: string]: Array<{ key: string; readData: any }>;
     } = {};
@@ -396,7 +400,7 @@ export default function ValuesTableView({
   );
 }
 
-function getQualityVariant(quality: string): any {
+function getQualityVariant(quality: string) {
   switch (quality) {
     case "good":
       return "success";

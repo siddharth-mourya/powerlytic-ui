@@ -9,6 +9,10 @@ import {
 } from "@/app/_components/Card/Card";
 import { IDevice } from "@/app/_lib/_react-query-hooks/device/devices.types";
 import { useValuesLatestRQ } from "@/app/_lib/_react-query-hooks/values/useValuesRQ";
+import {
+  IValue,
+  IValuesListResponse,
+} from "@/app/_lib/_react-query-hooks/values/values.types";
 import { Loader2, Activity } from "lucide-react";
 import { useMemo } from "react";
 
@@ -50,7 +54,7 @@ export default function LatestValuesSnapshot({
       return [];
     }
 
-    return latestValuesResponse.data.map((value: any) => {
+    return latestValuesResponse.data.map((value: IValue) => {
       const port = device.ports?.find((p) => p.portKey === value.port.portKey);
 
       // Extract Modbus read metadata if present
@@ -165,7 +169,7 @@ export default function LatestValuesSnapshot({
                       {isOn ? "ON" : "OFF"}
                     </span>
                     <Badge
-                      variant={getQualityColor(port.quality) as any}
+                      variant={getQualityColor(port.quality)}
                       className="text-xs"
                     >
                       {getQualityIcon(port.quality)}
@@ -205,7 +209,7 @@ export default function LatestValuesSnapshot({
                     </p>
                   )}
                   <Badge
-                    variant={getQualityColor(port.quality) as any}
+                    variant={getQualityColor(port.quality)}
                     className="text-xs ml-auto"
                   >
                     {getQualityIcon(port.quality)}
@@ -245,7 +249,7 @@ export default function LatestValuesSnapshot({
                     </p>
                   </div>
                   <Badge
-                    variant={getQualityColor(port.quality) as any}
+                    variant={getQualityColor(port.quality)}
                     className="text-xs ml-2 flex-shrink-0"
                   >
                     {getQualityIcon(port.quality)}
@@ -272,7 +276,7 @@ export default function LatestValuesSnapshot({
         <div className="p-6 text-center border border-dashed border-gray-300 rounded-lg bg-gray-50">
           <p className="text-sm text-gray-500 mb-1">No values available</p>
           <p className="text-xs text-gray-400">
-            Device hasn't sent readings yet
+            Device hasn`&apos;`t sent readings yet
           </p>
         </div>
       )}

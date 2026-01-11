@@ -61,14 +61,14 @@ export interface IValue {
   quality: "good" | "bad" | "uncertain";
 
   // 🔍 Debug
-  rawPayload?: Record<string, any>;
+  rawPayload?: Record<string, unknown>;
 }
 
 // 🔹 Value for Table View (row with all ports)
 export interface IValueTableRow {
   ts: Date;
   timestamp: string; // Formatted timestamp
-  [portKey: string]: any; // Dynamic columns for each port
+  [portKey: string]: unknown; // Dynamic columns for each port
   // Example structure:
   // ts: "2025-01-10T14:30:00Z",
   // DI_1: { value: 1, unit: null, quality: "good" },
