@@ -1,12 +1,12 @@
 import { api } from "@/app/_lib/api/axios";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "../queryKeys";
-import { Device, UpdateDeviceDTO } from "./devices.types";
+import { IDevice, IDeviceUpdateInput } from "./devices.types";
 
 // -----------------------------
 // 🔹 List All Devices
 // -----------------------------
-export type ListAllDevicesResponse = Device[];
+export type ListAllDevicesResponse = IDevice[];
 
 export const useDevicesListRQ = () => {
   const getAllDevices = async () => {
@@ -43,16 +43,16 @@ export const useDevicesListByOrgIdRQ = (organizationId?: string) => {
 };
 
 // -----------------------------
-// 🔹 Get Device By ID
+// 🔹 Get IDevice By ID
 // -----------------------------
 export const useDeviceByIdRQ = (id: string) => {
   const getDeviceById = async () => {
     const res = await api.get(`/devices/${id}`);
     if (res.status !== 200) throw new Error("Failed to fetch device");
-    return res.data as Device;
+    return res.data as IDevice;
   };
 
-  return useQuery<Device>({
+  return useQuery<IDevice>({
     queryKey: [queryKeys.devices.byId, id],
     queryFn: getDeviceById,
     enabled: !!id,
@@ -60,7 +60,7 @@ export const useDeviceByIdRQ = (id: string) => {
 };
 
 // -----------------------------
-// 🔹 Create Device
+// 🔹 Create IDevice
 // -----------------------------
 export interface CreateDeviceDTO {
   name: string;
@@ -77,7 +77,7 @@ export const useCreateDeviceMutation = () => {
       const res = await api.post("/devices", data);
       if (res.status !== 201 && res.status !== 200)
         throw new Error("Failed to create device");
-      return res.data as Device;
+      return res.data as IDevice;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -91,17 +91,17 @@ export const useCreateDeviceMutation = () => {
 };
 
 // -----------------------------
-// 🔹 Update Device
+// 🔹 Update IDevice
 // -----------------------------
 
 export const useUpdateDeviceMutation = (id: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: UpdateDeviceDTO) => {
+    mutationFn: async (data: IDeviceUpdateInput) => {
       const res = await api.put(`/devices/${id}`, data);
       if (res.status !== 200) throw new Error("Failed to update device");
-      return res.data as Device;
+      return res.data as IDevice;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -127,7 +127,7 @@ export const useUpdateDeviceOrgRQ = (deviceId: string) => {
       const res = await api.put(`/devices/${deviceId}`, data);
       if (res.status !== 200)
         throw new Error("Failed to update device organization");
-      return res.data as Device;
+      return res.data as IDevice;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -141,7 +141,7 @@ export const useUpdateDeviceOrgRQ = (deviceId: string) => {
 };
 
 // -----------------------------
-// 🔹 Delete Device
+// 🔹 Delete IDevice
 // -----------------------------
 export const useDeleteDeviceMutation = () => {
   const queryClient = useQueryClient();

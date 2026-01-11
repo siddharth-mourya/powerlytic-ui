@@ -4,8 +4,7 @@ import {
   GenericTable,
   TableColumn,
 } from "@/app/_components/GenericTable/GenericTable";
-import { SectionWrapper } from "@/app/_components/SectionWrapper/SectionWrapper";
-import { Device } from "@/app/_lib/_react-query-hooks/device/devices.types";
+import { IDevice } from "@/app/_lib/_react-query-hooks/device/devices.types";
 import { useDevicesListRQ } from "@/app/_lib/_react-query-hooks/device/useDevicesRQ";
 import axios from "axios";
 import { EyeIcon, PencilIcon, Trash2Icon } from "lucide-react";
@@ -19,18 +18,18 @@ export default function DeviceListPage() {
 
   console.log("DeviceListPage", devices);
 
-  const handleDelete = async (device: Device) => {
+  const handleDelete = async (device: IDevice) => {
     if (!confirm(`Are you sure you want to delete ${device.name}?`)) return;
     try {
       await axios.delete(`/api/devices/${device._id}`);
       toast.success("Device deleted");
       refetchDevices();
-    } catch (err) {
+    } catch {
       // toast.error(err?.response?.data?.message || err.message);
     }
   };
 
-  const columns: TableColumn<Device>[] = [
+  const columns: TableColumn<IDevice>[] = [
     {
       header: "Name",
       cell: ({ row }) => {
@@ -90,13 +89,17 @@ export default function DeviceListPage() {
         <div className="flex gap-2">
           <button
             className="btn btn-sm btn-outline"
-            onClick={() => router.push(`/devices/${row.original._id}`)}
+            onClick={() =>
+              router.push(`/dashboard/devices/${row.original._id}`)
+            }
           >
             View <EyeIcon className="w-3 h-3" />
           </button>
           <button
             className="btn btn-sm btn-primary"
-            onClick={() => router.push(`/devices/edit/${row.original._id}`)}
+            onClick={() =>
+              router.push(`/dashboard/devices/${row.original._id}/edit`)
+            }
           >
             <PencilIcon className="w-3 h-3" />
           </button>
@@ -113,7 +116,7 @@ export default function DeviceListPage() {
 
   return (
     // <SectionWrapper>
-    <GenericTable data={(devices as Device[]) ?? []} columns={columns} />
+    <GenericTable data={(devices as IDevice[]) ?? []} columns={columns} />
     // </SectionWrapper>
   );
 }

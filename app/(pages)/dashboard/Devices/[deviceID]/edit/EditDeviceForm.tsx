@@ -11,68 +11,53 @@ import { RoleProtectedGuard } from "@/app/_lib/utils/rbac/RoleProtectedGuard";
 import { Actions, Resources } from "@/app/_lib/utils/rbac/resources";
 import { Card, CardContent } from "@/app/_components/Card/Card";
 import { TextInput } from "@/app/_components/Inputs/TextInput";
-import { TextArea } from "@/app/_components/Inputs/Textarea";
 import Button from "@/app/_components/Button/Button";
 
-interface EditDeviceFormProps {
-  deviceId: string;
+import { IPortGroupWithIndex, PortGroup } from "./components/PortGroup";
+import { ModbusPortsSection } from "./components/ModbusPortsSection";
+import {
+  IDevice,
+  IPort,
+} from "@/app/_lib/_react-query-hooks/device/devices.types";
+
+/**
+ * Filter and map ports by key prefix, preserving original indices
+ */
+function filterPortsByPrefix(
+  ports: IPort[] | undefined,
+  prefix: string
+): IPortGroupWithIndex {
+  if (!ports) return [];
+  return ports
+    .map((p, idx) =>
+      p.portKey.startsWith(prefix) ? { ...p, originalIndex: idx } : null
+    )
+    .filter((p): p is IPort & { originalIndex: number } => p !== null);
 }
 
-interface DeviceFormValues {
-  name: string;
-  status: string;
-  pointOfContact: string;
-  alertEmails: string[];
-  alertPhones: string[];
-  metadata: Record<string, string | undefined>;
-  location: {
-    lat: number;
-    lng: number;
-    address: string;
-  };
-  ports: Array<{
-    status: string;
-    unit: string;
-    calibrationValue: {
-      scaling: number;
-      offset: number;
-    };
-    thresholds: {
-      min: number;
-      max: number;
-      message: string;
-    };
-  }>;
-}
-
-export function EditDeviceForm({ deviceId }: EditDeviceFormProps) {
+export function EditDeviceForm({ deviceId }: { deviceId: string }) {
   const { data: device, isLoading } = useDeviceByIdRQ(deviceId);
   const updateDevice = useUpdateDeviceMutation(deviceId);
 
-  const form = useForm<DeviceFormValues>({
+  const form = useForm<IDevice>({
     defaultValues: {
-      name: "",
-      status: "offline",
-      pointOfContact: "",
       alertEmails: [],
       alertPhones: [],
-      metadata: {},
-      location: { lat: NaN, lng: NaN, address: "" },
-      ports: [],
     },
+    shouldFocusError: false,
+    mode: "onChange",
   });
-
   const {
     register,
     handleSubmit,
     reset,
     control,
-    formState: { isSubmitting },
+    formState: { errors },
   } = form;
 
   const {
     fields: emailFields,
-    append: appendEmail,
+    append: addEmail,
     remove: removeEmail,
   } = useFieldArray({
     control,
@@ -82,7 +67,7 @@ export function EditDeviceForm({ deviceId }: EditDeviceFormProps) {
 
   const {
     fields: phoneFields,
-    append: appendPhone,
+    append: addPhone,
     remove: removePhone,
   } = useFieldArray({
     control,
@@ -91,22 +76,25 @@ export function EditDeviceForm({ deviceId }: EditDeviceFormProps) {
   });
 
   useEffect(() => {
-    if (device) {
-      reset({
-        name: device.name,
-        status: device.status,
-        pointOfContact: device.pointOfContact || "",
-        alertEmails: device.alertEmails || [""],
-        alertPhones: device.alertPhones || [""],
-        metadata: (device.metadata as Record<string, string | undefined>) || {},
-        location: device.location || { lat: NaN, lng: NaN, address: "" },
-        ports: device.ports || [],
-      });
-    }
+    if (device) reset(device);
   }, [device, reset]);
 
-  const onSubmit = () => {
-    // updateDevice.mutate(values as UpdateDeviceDTO);
+  const onSubmit = (values: IDevice) => {
+    console.log("Submitting", values);
+    if (Object.keys(errors).length > 0) {
+      console.warn("Form has validation errors:", errors);
+      return;
+    }
+    updateDevice.mutate({
+      name: values.name,
+      status: values.status,
+      pointOfContact: values.pointOfContact,
+      alertEmails: values.alertEmails,
+      alertPhones: values.alertPhones,
+      location: values.location,
+      metadata: values.metadata,
+      ports: values.ports,
+    });
   };
 
   if (isLoading) return <p>Loading...</p>;
@@ -114,261 +102,107 @@ export function EditDeviceForm({ deviceId }: EditDeviceFormProps) {
   return (
     <RoleProtectedGuard resource={Resources.DEVICES} action={Actions.EDIT}>
       <SectionWrapper>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="space-y-8"
+          noValidate
+        >
           {/* Device Info */}
           <Card>
-            <CardContent className="space-y-4 p-6">
-              <h2 className="text-lg font-semibold text-gray-700">
-                Device Info
-              </h2>
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label>Name</label>
-                  <TextInput {...register("name")} placeholder="Device Name" />
-                </div>
-                <div>
-                  <label>Status</label>
-                  <select
-                    {...register("status")}
-                    className="select select-bordered w-full"
-                  >
-                    <option value="online">Online</option>
-                    <option value="offline">Offline</option>
-                    <option value="maintenance">Maintenance</option>
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label>Point of Contact</label>
-                <TextInput
-                  {...register("pointOfContact")}
-                  placeholder="Contact Name / Email"
-                />
-              </div>
+            <CardContent className="p-6 space-y-4">
+              <TextInput label="Device Name" {...register("name")} />
+              <select
+                {...register("status")}
+                className="select select-bordered"
+              >
+                <option value="online">Online</option>
+                <option value="offline">Offline</option>
+                <option value="maintenance">Maintenance</option>
+              </select>
             </CardContent>
           </Card>
 
-          {/* Ports Configuration */}
+          {/* Ports */}
           <Card>
-            <CardContent className="space-y-4 p-6">
-              <h2 className="text-lg font-semibold text-gray-700">
-                Ports Configuration
-              </h2>
-              {device?.ports?.length ? (
-                <div className="grid md:grid-cols-2 gap-4">
-                  {device.ports.map((port, index) => (
-                    <div
-                      key={port.portNumber}
-                      className="border p-4 rounded-lg space-y-3"
-                    >
-                      <div className="flex justify-between items-center">
-                        <h3 className="font-medium">{port.name}</h3>
-                        <span
-                          className={`badge ${
-                            port.status === "ACTIVE"
-                              ? "badge-primary"
-                              : "badge-outline"
-                          }`}
-                        >
-                          {port.status || "INACTIVE"}
-                        </span>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <label>Status</label>
-                          <select
-                            {...register(`ports.${index}.status`)}
-                            defaultValue={port.status}
-                            className="select select-bordered w-full"
-                          >
-                            <option value="ACTIVE">Active</option>
-                            <option value="INACTIVE">Inactive</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label>Unit</label>
-                          <TextInput
-                            {...register(`ports.${index}.unit`)}
-                            defaultValue={port.unit || ""}
-                          />
-                        </div>
-                        <div>
-                          <label>Scaling</label>
-                          <TextInput
-                            type="number"
-                            step="any"
-                            {...register(
-                              `ports.${index}.calibrationValue.scaling`
-                            )}
-                            defaultValue={port.calibrationValue?.scaling ?? 1}
-                          />
-                        </div>
-                        <div>
-                          <label>Offset</label>
-                          <TextInput
-                            type="number"
-                            step="any"
-                            {...register(
-                              `ports.${index}.calibrationValue.offset`
-                            )}
-                            defaultValue={port.calibrationValue?.offset ?? 0}
-                          />
-                        </div>
-                      </div>
-
-                      {/* Thresholds */}
-                      <div className="pt-2 border-t">
-                        <label>Thresholds</label>
-                        <div className="grid grid-cols-3 gap-2">
-                          <TextInput
-                            type="number"
-                            step="any"
-                            placeholder="Min"
-                            {...register(`ports.${index}.thresholds.min`)}
-                            defaultValue={port.thresholds?.min ?? ""}
-                          />
-                          <TextInput
-                            type="number"
-                            step="any"
-                            placeholder="Max"
-                            {...register(`ports.${index}.thresholds.max`)}
-                            defaultValue={port.thresholds?.max ?? ""}
-                          />
-                          <TextInput
-                            placeholder="Message"
-                            {...register(`ports.${index}.thresholds.message`)}
-                            defaultValue={port.thresholds?.message ?? ""}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p>No ports found for this device model.</p>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Metadata */}
-          <Card>
-            <CardContent className="space-y-4 p-6">
-              <h2 className="text-lg font-semibold text-gray-700">
-                Device Metadata
-              </h2>
-              <TextArea
-                {...register("metadata.info")}
-                placeholder="Enter metadata as JSON or plain text"
+            <CardContent className="p-6 space-y-6">
+              <PortGroup
+                title="Digital Inputs"
+                color="border-blue-300"
+                ports={filterPortsByPrefix(device?.ports, "DI")}
+                register={register}
+              />
+              <PortGroup
+                title="Analog Inputs"
+                color="border-green-300"
+                ports={filterPortsByPrefix(device?.ports, "AI")}
+                register={register}
+              />
+              <ModbusPortsSection
+                ports={filterPortsByPrefix(device?.ports, "MI")}
+                register={register}
               />
             </CardContent>
           </Card>
 
           {/* Alerts */}
-          <Card>
-            <CardContent className="space-y-4 p-6">
-              <h2 className="text-lg font-semibold text-gray-700">
-                Alerts & Notifications
-              </h2>
+          <Card className="flex flex-wrap">
+            <CardContent className="p-6 space-y-4">
+              <h3 className="font-semibold text-gray-700">Alert Emails</h3>
+              {emailFields.map((field, i) => (
+                <div key={field.id} className="flex items-center gap-2">
+                  <TextInput
+                    {...register(`alertEmails.${i}`)}
+                    placeholder="email@example.com"
+                  />
+                  <Button
+                    type="button"
+                    variant="danger"
+                    size="sm"
+                    onClick={() => removeEmail(i)}
+                  >
+                    Remove
+                  </Button>
+                </div>
+              ))}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => (addEmail as (val: unknown) => void)("")}
+              >
+                + Add Email
+              </Button>
+            </CardContent>
 
-              <div>
-                <label>Alert Emails</label>
-                {emailFields.map((field, index) => (
-                  <div key={field.id} className="flex items-center gap-2 mb-2">
-                    <TextInput
-                      {...register(`alertEmails.${index}`)}
-                      placeholder="email@example.com"
-                    />
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="danger"
-                      onClick={() => removeEmail(index)}
-                    >
-                      Remove
-                    </Button>
-                  </div>
-                ))}
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => (appendEmail as (val: unknown) => void)("")}
-                >
-                  + Add Email
-                </Button>
-              </div>
-
-              <div>
-                <label>Alert Phones</label>
-                {phoneFields.map((field, index) => (
-                  <div key={field.id} className="flex items-center gap-2 mb-2">
-                    <TextInput
-                      {...register(`alertPhones.${index}`)}
-                      placeholder="+91 9876543210"
-                    />
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="danger"
-                      onClick={() => removePhone(index)}
-                    >
-                      Remove
-                    </Button>
-                  </div>
-                ))}
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => (appendPhone as (val: unknown) => void)("")}
-                >
-                  + Add Phone
-                </Button>
-              </div>
+            <CardContent className="p-6 space-y-4">
+              <h3 className="font-semibold text-gray-700">Alert Phones</h3>
+              {phoneFields.map((field, i) => (
+                <div key={field.id} className="flex items-center gap-2">
+                  <TextInput
+                    {...register(`alertPhones.${i}`)}
+                    placeholder="+91 9876543210"
+                  />
+                  <Button
+                    type="button"
+                    variant="danger"
+                    size="sm"
+                    onClick={() => removePhone(i)}
+                  >
+                    Remove
+                  </Button>
+                </div>
+              ))}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => (addPhone as (val: unknown) => void)("")}
+              >
+                + Add Phone
+              </Button>
             </CardContent>
           </Card>
 
-          {/* Location */}
-          <Card>
-            <CardContent className="space-y-4 p-6">
-              <h2 className="text-lg font-semibold text-gray-700">
-                Device Location
-              </h2>
-              <div className="grid md:grid-cols-3 gap-4">
-                <div>
-                  <label>Latitude</label>
-                  <TextInput
-                    type="number"
-                    step="any"
-                    {...register("location.lat")}
-                  />
-                </div>
-                <div>
-                  <label>Longitude</label>
-                  <TextInput
-                    type="number"
-                    step="any"
-                    {...register("location.lng")}
-                  />
-                </div>
-                <div>
-                  <label>Address</label>
-                  <TextInput
-                    {...register("location.address")}
-                    placeholder="Enter address"
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Submit */}
           <div className="flex justify-end">
-            <Button
-              type="submit"
-              disabled={isSubmitting || updateDevice.isPending}
-            >
-              {updateDevice.isPending ? "Updating..." : "Save Changes"}
-            </Button>
+            <Button type="submit">Save Changes</Button>
           </div>
         </form>
       </SectionWrapper>
