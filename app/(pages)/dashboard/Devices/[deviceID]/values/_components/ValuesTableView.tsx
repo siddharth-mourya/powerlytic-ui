@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 "use client";
 
 import { Card, CardContent } from "@/app/_components/Card/Card";
@@ -29,7 +32,6 @@ interface ValuesTableViewProps {
 interface TableRow {
   timestamp: string;
   ts: Date;
-  // @ts-ignore
   [key: string]: any;
 }
 
@@ -77,7 +79,7 @@ export default function ValuesTableView({
         ) {
           // Modbus data is nested: { "slaveId_readTag": { readId, slaveId, readName, calibratedValue, ... } }
           Object.keys(portData).forEach((readKey) => {
-            // @ts-ignore
+            // @ts-expect-error – Modbus reads are dynamic
             const readData = portData[readKey];
             // Create a flattened key for this read
             const flatKey = `${portKey}_${readKey}`;
@@ -98,7 +100,6 @@ export default function ValuesTableView({
 
   // Extract Modbus read keys from actual data (since API returns nested structure)
   const modbusReadKeys = useMemo(() => {
-    // @ts-ignore
     const keys: {
       [portKey: string]: Array<{ key: string; readData: any }>;
     } = {};
