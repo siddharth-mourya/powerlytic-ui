@@ -74,6 +74,15 @@ export const BREADCRUMBS = {
       { label: "Device Details", path: "" },
     ],
   },
+  deviceValues: {
+    route: "/dashboard/devices/:id/values",
+    items: [
+      { label: "Dashboard", path: "/dashboard" },
+      { label: "Devices", path: "/dashboard/devices" },
+      { label: "Device Details", path: "" },
+      { label: "Values", path: "" },
+    ],
+  },
   newDevice: {
     route: "/dashboard/devices/new",
     items: [

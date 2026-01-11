@@ -24,4 +24,16 @@ export const queryKeys = {
     listAllByOrgId: "devices-list-all-by-org",
     byId: "device-by-id",
   },
+  values: {
+    list: "values-list",
+    latest: "values-latest",
+    portSpecific: "values-port-specific",
+    modbusRead: "values-modbus-read",
+    stats: "values-stats",
+    table: "values-table",
+    snapshot: "values-snapshot",
+    timeseries: "values-timeseries",
+    modbusTimeseries: "values-modbus-timeseries",
+    status: "values-status",
+  },
 };

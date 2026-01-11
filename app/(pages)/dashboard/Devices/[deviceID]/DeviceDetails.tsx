@@ -22,12 +22,15 @@ import {
   Calendar1,
   Cpu,
   CpuIcon,
+  EyeIcon,
   Loader2,
   MapPin,
   Network,
+  PencilIcon,
   Smartphone,
   SmartphoneIcon,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 interface DeviceDetailsPageProps {
@@ -36,6 +39,7 @@ interface DeviceDetailsPageProps {
 
 export function DeviceDetails({ deviceId }: DeviceDetailsPageProps) {
   const { data: device, isLoading: deviceLoading } = useDeviceByIdRQ(deviceId);
+  const router = useRouter();
 
   const { data: organizations } = useQuery<Organization[]>({
     queryKey: ["organizations"],
@@ -80,9 +84,27 @@ export function DeviceDetails({ deviceId }: DeviceDetailsPageProps) {
               IMEI: {device.imei}
             </p>
           </div>
-          <Badge variant={device.status === "online" ? "success" : "error"}>
-            {device.status || "offline"}
-          </Badge>
+          <div className="flex gap-2">
+            <button
+              className="btn btn-sm btn-outline"
+              onClick={() =>
+                router.push(`/dashboard/devices/${device._id}/values`)
+              }
+            >
+              All values <EyeIcon className="w-3 h-3" />
+            </button>
+            <button
+              className="btn btn-sm btn-primary"
+              onClick={() =>
+                router.push(`/dashboard/devices/${device._id}/edit`)
+              }
+            >
+              <PencilIcon className="w-3 h-3" />
+            </button>
+            <Badge variant={device.status === "online" ? "success" : "error"}>
+              {device.status || "offline"}
+            </Badge>
+          </div>
         </div>
 
         {/* Summary cards */}
@@ -201,7 +223,7 @@ export function DeviceDetails({ deviceId }: DeviceDetailsPageProps) {
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {device.ports.map((port) => (
                   <div
-                    key={port.portNumber}
+                    key={port.portKey}
                     className="p-3 border border-gray-200 rounded-lg bg-gray-50 hover:bg-white hover:shadow-sm transition"
                   >
                     <div className="flex justify-between items-center mb-1">
@@ -215,7 +237,7 @@ export function DeviceDetails({ deviceId }: DeviceDetailsPageProps) {
                       </Badge>
                     </div>
                     <p className="text-xs text-gray-500 mb-1">
-                      Port #{port.portNumber}
+                      Port #{port.portKey}
                     </p>
                     <div className="text-xs space-y-1 text-gray-600">
                       {port.unit && <p>Unit: {port.unit}</p>}

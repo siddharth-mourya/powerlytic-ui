@@ -10,9 +10,7 @@ export type ListAllDevicesResponse = IDevice[];
 
 export const useDevicesListRQ = () => {
   const getAllDevices = async () => {
-    console.log("sterted ");
     const res = await api.get("/devices");
-    console.log("fetching", res);
     if (res.status !== 200) throw new Error("Failed to fetch devices");
     return res.data as ListAllDevicesResponse;
   };

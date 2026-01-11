@@ -16,8 +16,6 @@ export default function DeviceListPage() {
   const router = useRouter();
   const { data: devices, refetch: refetchDevices } = useDevicesListRQ();
 
-  console.log("DeviceListPage", devices);
-
   const handleDelete = async (device: IDevice) => {
     if (!confirm(`Are you sure you want to delete ${device.name}?`)) return;
     try {

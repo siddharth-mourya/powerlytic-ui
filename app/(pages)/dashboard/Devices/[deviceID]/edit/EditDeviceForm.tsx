@@ -9,7 +9,7 @@ import {
 import { SectionWrapper } from "@/app/_components/SectionWrapper/SectionWrapper";
 import { RoleProtectedGuard } from "@/app/_lib/utils/rbac/RoleProtectedGuard";
 import { Actions, Resources } from "@/app/_lib/utils/rbac/resources";
-import { Card, CardContent } from "@/app/_components/Card/Card";
+import { Card, CardContent, CardTitle } from "@/app/_components/Card/Card";
 import { TextInput } from "@/app/_components/Inputs/TextInput";
 import Button from "@/app/_components/Button/Button";
 
@@ -109,6 +109,9 @@ export function EditDeviceForm({ deviceId }: { deviceId: string }) {
         >
           {/* Device Info */}
           <Card>
+            <CardTitle className="px-6 pt-6">
+              Editing - {device?.name}
+            </CardTitle>
             <CardContent className="p-6 space-y-4">
               <TextInput label="Device Name" {...register("name")} />
               <select

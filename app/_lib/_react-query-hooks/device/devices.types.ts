@@ -99,11 +99,11 @@ export interface IDevice {
   pointOfContact?: string;
   alertEmails?: string[];
   alertPhones?: string[];
-  assignedAt?: Date;
-  lastSeen?: Date;
-  manufacturingYear?: Date;
-  createdAt?: Date;
-  updatedAt?: Date;
+  assignedAt?: string;
+  lastSeen?: string;
+  manufacturingYear?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 // 🔹 Device Creation Input (without _id and timestamps)
@@ -112,7 +112,7 @@ export interface IDeviceCreateInput {
   imei: string;
   deviceModelId: string;
   metadata?: Record<string, string | number | boolean | null>;
-  manufacturingYear?: Date;
+  manufacturingYear?: string;
 }
 
 // 🔹 Device Update Input (all fields optional except _id)
@@ -127,7 +127,7 @@ export interface IDeviceUpdateInput {
   pointOfContact?: string;
   alertEmails?: string[];
   alertPhones?: string[];
-  assignedAt?: Date;
+  assignedAt?: string;
 }
 
 // 🔹 Port Creation Input (without _id)
