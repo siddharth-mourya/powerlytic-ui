@@ -27,6 +27,7 @@ import {
   MapPin,
   Network,
   PencilIcon,
+  Settings,
   Smartphone,
   SmartphoneIcon,
 } from "lucide-react";
@@ -92,6 +93,14 @@ export function DeviceDetails({ deviceId }: DeviceDetailsPageProps) {
               }
             >
               All values <EyeIcon className="w-3 h-3" />
+            </button>
+            <button
+              className="btn btn-sm btn-secondary"
+              onClick={() =>
+                router.push(`/dashboard/devices/${device._id}/update-values`)
+              }
+            >
+              Simulate Values <Settings className="w-3 h-3" />
             </button>
             <button
               className="btn btn-sm btn-primary"
