@@ -10,7 +10,7 @@ export type ListAllDevicesResponse = IDevice[];
 
 export const useDevicesListRQ = () => {
   const getAllDevices = async () => {
-    const res = await api.get("/devices");
+    const res = await api.get("/device");
     if (res.status !== 200) throw new Error("Failed to fetch devices");
     return res.data as ListAllDevicesResponse;
   };
@@ -25,7 +25,7 @@ export const useDevicesListRQ = () => {
 
 export const useDevicesListByOrgIdRQ = (organizationId?: string) => {
   const getAllDevices = async () => {
-    const res = await api.get("/devices", {
+    const res = await api.get("/device", {
       params: organizationId ? { organizationId } : {},
     });
     if (res.status !== 200) throw new Error("Failed to fetch devices");
@@ -45,7 +45,7 @@ export const useDevicesListByOrgIdRQ = (organizationId?: string) => {
 // -----------------------------
 export const useDeviceByIdRQ = (id: string) => {
   const getDeviceById = async () => {
-    const res = await api.get(`/devices/${id}`);
+    const res = await api.get(`/device/${id}`);
     if (res.status !== 200) throw new Error("Failed to fetch device");
     return res.data as IDevice;
   };
@@ -72,7 +72,7 @@ export const useCreateDeviceMutation = () => {
 
   return useMutation({
     mutationFn: async (data: CreateDeviceDTO) => {
-      const res = await api.post("/devices", data);
+      const res = await api.post("/device", data);
       if (res.status !== 201 && res.status !== 200)
         throw new Error("Failed to create device");
       return res.data as IDevice;
@@ -97,7 +97,7 @@ export const useUpdateDeviceMutation = (id: string) => {
 
   return useMutation({
     mutationFn: async (data: IDeviceUpdateInput) => {
-      const res = await api.put(`/devices/${id}`, data);
+      const res = await api.put(`/device/${id}`, data);
       if (res.status !== 200) throw new Error("Failed to update device");
       return res.data as IDevice;
     },
@@ -122,7 +122,7 @@ export const useUpdateDeviceOrgRQ = (deviceId: string) => {
 
   return useMutation({
     mutationFn: async (data: UpdateDeviceOrgDTO) => {
-      const res = await api.put(`/devices/${deviceId}`, data);
+      const res = await api.put(`/device/${deviceId}`, data);
       if (res.status !== 200)
         throw new Error("Failed to update device organization");
       return res.data as IDevice;
@@ -146,7 +146,7 @@ export const useDeleteDeviceMutation = () => {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const res = await api.delete(`/devices/${id}`);
+      const res = await api.delete(`/device/${id}`);
       if (res.status !== 200) throw new Error("Failed to delete device");
       return res.data;
     },
