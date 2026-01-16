@@ -54,7 +54,7 @@ export const useValuesLatestRQ = (deviceId: string) => {
     queryFn: getLatestValues,
     enabled: !!deviceId,
     staleTime: 1000 * 10, // 10 seconds
-    refetchInterval: 1000 * 30, // Refetch every 30 seconds
+    refetchInterval: 1000 * 5, // Refetch every 30 seconds
   });
 };
 
