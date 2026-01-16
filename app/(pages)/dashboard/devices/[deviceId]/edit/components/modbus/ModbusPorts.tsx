@@ -1,26 +1,10 @@
 import {
   IDevice,
-  IModbusRead,
-  IModbusSlave,
   IPort,
 } from "@/app/_lib/_react-query-hooks/device/devices.types";
-import { useFieldArray, Control, UseFormRegister } from "react-hook-form";
+import { Control, useFieldArray, UseFormRegister } from "react-hook-form";
 import { SlaveSection } from "./SlaveSection";
-
-export type IModbusReadForm = Omit<
-  IModbusRead,
-  "readId" | "slaveId" | "portKey"
-> & {
-  readId?: string;
-  slaveId?: string;
-  portKey?: string;
-};
-
-export type IModbusSlaveForm = Omit<IModbusSlave, "slaveId" | "portKey"> & {
-  slaveId?: string;
-  portKey?: string;
-  reads: IModbusReadForm[];
-};
+import Button from "@/app/_components/Button/Button";
 
 export function ModbusPort({
   port,
@@ -33,37 +17,38 @@ export function ModbusPort({
 }) {
   const portIndex = port.originalIndex;
 
-  const {
-    fields: slaves,
-    append: addSlave,
-    remove: removeSlave,
-  } = useFieldArray({
+  const { fields, append, remove } = useFieldArray({
     control,
     name: `ports.${portIndex}.modbusSlaves`,
   });
 
   return (
-    <div className="border border-purple-300 rounded-lg p-4">
-      <h3 className="font-semibold mb-3">
-        {port.name} ({port.portKey})
-      </h3>
+    <div className="rounded-lg border border-purple-200 bg-purple-50 p-4 space-y-4">
+      <div className="flex justify-between items-center">
+        <h3 className="font-semibold text-purple-800">
+          {port.name} ({port.portKey})
+        </h3>
+      </div>
 
-      {slaves.map((slave, slaveIndex) => (
-        <SlaveSection
-          key={slave.id}
-          portIndex={portIndex}
-          slaveIndex={slaveIndex}
-          control={control}
-          register={register}
-          onRemove={() => removeSlave(slaveIndex)}
-        />
-      ))}
+      <div className="space-y-3">
+        {fields.map((_, idx) => (
+          <SlaveSection
+            key={idx}
+            portIndex={portIndex}
+            slaveIndex={idx}
+            control={control}
+            register={register}
+            onRemove={() => remove(idx)}
+          />
+        ))}
+      </div>
 
-      <button
+      <Button
         type="button"
-        className="btn btn-outline btn-sm mt-3"
+        variant="outline"
+        size="sm"
         onClick={() =>
-          addSlave({
+          append({
             name: "New Slave",
             slaveId: "",
             portKey: "",
@@ -79,7 +64,7 @@ export function ModbusPort({
         }
       >
         + Add Slave
-      </button>
+      </Button>
     </div>
   );
 }

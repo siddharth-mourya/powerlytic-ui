@@ -53,8 +53,8 @@ export const useValuesLatestRQ = (deviceId: string) => {
     queryKey: [queryKeys.values.latest, deviceId],
     queryFn: getLatestValues,
     enabled: !!deviceId,
-    staleTime: 1000 * 10, // 10 seconds
-    refetchInterval: 1000 * 5, // Refetch every 30 seconds
+    staleTime: 1000 * 3, // 10 seconds
+    refetchInterval: 1000 * 3, // Refetch every 1 seconds
   });
 };
 

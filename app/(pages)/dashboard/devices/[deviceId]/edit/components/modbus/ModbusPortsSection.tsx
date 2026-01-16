@@ -2,6 +2,7 @@ import { IDevice } from "@/app/_lib/_react-query-hooks/device/devices.types";
 import { IPortGroupWithIndex } from "../PortGroup";
 import { Control, UseFormRegister } from "react-hook-form";
 import { ModbusPort } from "./ModbusPorts";
+import { AccordionHeader } from "@/app/_components/Accordion/AccordionHeader";
 
 interface ModbusPortsSectionProps {
   ports?: IPortGroupWithIndex;
@@ -17,12 +18,13 @@ export function ModbusPortsSection({
   if (!ports?.length) return null;
 
   return (
-    <details open>
-      <summary className="cursor-pointer font-medium text-purple-600">
-        Modbus Input Ports
-      </summary>
+    <details className="group rounded-lg border border-purple-200 bg-white">
+      <AccordionHeader
+        title="Modbus Input Ports"
+        subtitle={`${ports.length} modbus ports`}
+      />
 
-      <div className="space-y-6 mt-4">
+      <div className="space-y-6 p-4">
         {ports.map((port) => (
           <ModbusPort
             key={port.portKey}

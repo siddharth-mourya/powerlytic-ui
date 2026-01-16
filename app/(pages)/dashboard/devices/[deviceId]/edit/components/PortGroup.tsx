@@ -1,9 +1,10 @@
+import { AccordionHeader } from "@/app/_components/Accordion/AccordionHeader";
 import { TextInput } from "@/app/_components/Inputs/TextInput";
-import { ReadOnlyField } from "./ReadOnlyField";
-import { IPort } from "@/app/_lib/_react-query-hooks/device/devices.types";
+import {
+  IDevice,
+  IPort,
+} from "@/app/_lib/_react-query-hooks/device/devices.types";
 import { UseFormRegister } from "react-hook-form";
-import { IDevice } from "@/app/_lib/_react-query-hooks/device/devices.types";
-
 interface PortGroupProps {
   title: string;
   color: string;
@@ -13,33 +14,36 @@ interface PortGroupProps {
 
 export type IPortGroupWithIndex = Array<IPort & { originalIndex: number }>;
 
-export function PortGroup({ title, color, ports, register }: PortGroupProps) {
+export function PortGroup({ title, ports, register }: PortGroupProps) {
   if (!ports?.length) return null;
 
   return (
-    <details className="group">
-      <summary className="cursor-pointer font-medium">{title}</summary>
+    <details className="group rounded-lg border border-gray-200 bg-white">
+      <AccordionHeader title={title} subtitle={`${ports.length} ports`} />
 
-      <div className="grid md:grid-cols-2 gap-4 mt-4">
-        {ports?.map((port) => {
-          const actualIndex = port.originalIndex;
+      <div className="grid gap-4 p-4 md:grid-cols-2">
+        {ports.map((port) => {
+          const i = port.originalIndex;
+
           return (
             <div
               key={port.portKey}
-              className={`border ${color} rounded-lg p-4 space-y-3`}
+              className="rounded-md border border-gray-200 bg-gray-50 p-4 space-y-4"
             >
-              <div className="flex justify-between items-center">
-                <h3 className="font-medium">{port.name}</h3>
-                <span className="badge badge-outline">{port.portKey}</span>
+              <div className="flex items-center justify-between">
+                <h3 className="font-medium text-gray-800">{port.name}</h3>
+                <span className="rounded bg-white px-2 py-0.5 text-xs text-gray-600 border">
+                  {port.portKey}
+                </span>
               </div>
 
-              <ReadOnlyField label="Port Key" value={port.portKey} />
-
               <div className="grid grid-cols-2 gap-3">
+                <TextInput label="Unit" {...register(`ports.${i}.unit`)} />
+
                 <div>
-                  <label>Status</label>
+                  <label className="text-xs">Status</label>
                   <select
-                    {...register(`ports.${actualIndex}.status`)}
+                    {...register(`ports.${i}.status`)}
                     className="select select-bordered w-full"
                   >
                     <option value="ACTIVE">Active</option>
@@ -47,50 +51,36 @@ export function PortGroup({ title, color, ports, register }: PortGroupProps) {
                   </select>
                 </div>
 
-                <div>
-                  <label>Unit</label>
-                  <TextInput {...register(`ports.${actualIndex}.unit`)} />
-                </div>
-
-                <div>
-                  <label>Scaling</label>
-                  <TextInput
-                    type="number"
-                    step="any"
-                    {...register(
-                      `ports.${actualIndex}.calibrationValue.scaling`
-                    )}
-                  />
-                </div>
-
-                <div>
-                  <label>Offset</label>
-                  <TextInput
-                    type="number"
-                    step="any"
-                    {...register(
-                      `ports.${actualIndex}.calibrationValue.offset`
-                    )}
-                  />
-                </div>
+                <TextInput
+                  label="Scaling"
+                  type="number"
+                  {...register(`ports.${i}.calibrationValue.scaling`)}
+                />
+                <TextInput
+                  label="Offset"
+                  type="number"
+                  {...register(`ports.${i}.calibrationValue.offset`)}
+                />
               </div>
 
-              <div className="pt-2 border-t">
-                <label className="text-sm">Thresholds</label>
+              <div className="border-t pt-3">
+                <div className="text-xs font-medium text-gray-600 mb-2">
+                  Thresholds
+                </div>
                 <div className="grid grid-cols-3 gap-2">
                   <TextInput
-                    type="number"
                     placeholder="Min"
-                    {...register(`ports.${actualIndex}.thresholds.min`)}
+                    type="number"
+                    {...register(`ports.${i}.thresholds.min`)}
                   />
                   <TextInput
-                    type="number"
                     placeholder="Max"
-                    {...register(`ports.${actualIndex}.thresholds.max`)}
+                    type="number"
+                    {...register(`ports.${i}.thresholds.max`)}
                   />
                   <TextInput
                     placeholder="Message"
-                    {...register(`ports.${actualIndex}.thresholds.message`)}
+                    {...register(`ports.${i}.thresholds.message`)}
                   />
                 </div>
               </div>

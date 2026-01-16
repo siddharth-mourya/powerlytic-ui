@@ -1,3 +1,5 @@
+import { AccordionHeader } from "@/app/_components/Accordion/AccordionHeader";
+import Button from "@/app/_components/Button/Button";
 import { Card, CardContent, CardTitle } from "@/app/_components/Card/Card";
 import { TextInput } from "@/app/_components/Inputs/TextInput";
 import { IDevice } from "@/app/_lib/_react-query-hooks/device/devices.types";
@@ -17,178 +19,172 @@ export function SlaveSection({
   register: UseFormRegister<IDevice>;
   onRemove: () => void;
 }) {
-  const {
-    fields: reads,
-    append: addRead,
-    remove: removeRead,
-  } = useFieldArray({
+  const { fields, append, remove } = useFieldArray({
     control,
     name: `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads`,
   });
 
   return (
-    <details className="mb-4">
-      <summary className="cursor-pointer font-medium">
-        Slave #{slaveIndex + 1}
-      </summary>
+    <details className="group rounded-md border border-gray-200 bg-white">
+      <AccordionHeader title={`Slave ${slaveIndex + 1}`} />
 
-      <div className="mt-3 space-y-4 pl-4">
-        {/* Serial */}
-        <Card>
-          <CardTitle>Serial Configuration</CardTitle>
-          <CardContent className="grid grid-cols-4 gap-3">
-            <TextInput
-              {...register(
-                `ports.${portIndex}.modbusSlaves.${slaveIndex}.serial.baudRate`
-              )}
-              label="Baud Rate"
-              type="number"
-            />
-            <TextInput
-              {...register(
-                `ports.${portIndex}.modbusSlaves.${slaveIndex}.serial.dataBits`
-              )}
-              label="Data Bits"
-              type="number"
-            />
-            <TextInput
-              {...register(
-                `ports.${portIndex}.modbusSlaves.${slaveIndex}.serial.stopBits`
-              )}
-              label="Stop Bits"
-              type="number"
-            />
-            <TextInput
-              {...register(
-                `ports.${portIndex}.modbusSlaves.${slaveIndex}.serial.parity`
-              )}
-              label="Parity"
-            />
-          </CardContent>
-        </Card>
-
-        {/* Polling */}
-        <Card>
-          <CardTitle className="border-b border-base-200">
-            Polling Configuration
-          </CardTitle>
-          <CardContent className="p-4 grid grid-cols-3 gap-3">
-            <TextInput
-              label="Interval (ms)"
-              type="number"
-              {...register(
-                `ports.${portIndex}.modbusSlaves.${slaveIndex}.polling.intervalMs`
-              )}
-            />
-            <TextInput
-              label="Timeout (ms)"
-              type="number"
-              {...register(
-                `ports.${portIndex}.modbusSlaves.${slaveIndex}.polling.timeoutMs`
-              )}
-            />
-            <TextInput
-              label="Retries"
-              type="number"
-              {...register(
-                `ports.${portIndex}.modbusSlaves.${slaveIndex}.polling.retries`
-              )}
-            />
-          </CardContent>
-        </Card>
-
-        {/* Reads */}
-        {reads.map((read, readIndex) => (
-          <Card key={read.id}>
-            <div className="flex justify-between">
-              <CardTitle>Read #{readIndex + 1}</CardTitle>
-              <button type="button" onClick={() => removeRead(readIndex)}>
-                <Trash2 color="#9c5e5e" />
-              </button>
-            </div>
-            <CardContent className="grid md:grid-cols-3 gap-3">
+      <div className="space-y-4 p-4">
+        {/* Serial + Polling */}
+        <div className="grid grid-cols-2 gap-4">
+          <Card>
+            <CardTitle>Serial</CardTitle>
+            <CardContent className="grid grid-cols-2 gap-2">
               <TextInput
-                label="startAddress"
                 {...register(
-                  `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.startAddress`
+                  `ports.${portIndex}.modbusSlaves.${slaveIndex}.serial.baudRate`
                 )}
+                label="Baud Rate"
+                type="number"
               />
               <TextInput
-                label="Name"
                 {...register(
-                  `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.name`
+                  `ports.${portIndex}.modbusSlaves.${slaveIndex}.serial.dataBits`
                 )}
+                label="Data Bits"
+                type="number"
               />
               <TextInput
-                label="Unit"
                 {...register(
-                  `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.unit`
+                  `ports.${portIndex}.modbusSlaves.${slaveIndex}.serial.stopBits`
                 )}
+                label="Stop Bits"
+                type="number"
               />
               <TextInput
-                label="Scaling"
+                {...register(
+                  `ports.${portIndex}.modbusSlaves.${slaveIndex}.serial.parity`
+                )}
+                label="Parity"
+              />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardTitle>Polling</CardTitle>
+            <CardContent className="grid grid-cols-3 gap-2">
+              <TextInput
+                label="Interval (ms)"
                 type="number"
                 {...register(
-                  `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.scaling`
+                  `ports.${portIndex}.modbusSlaves.${slaveIndex}.polling.intervalMs`
                 )}
               />
               <TextInput
-                label="Offset"
+                label="Timeout (ms)"
                 type="number"
                 {...register(
-                  `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.offset`
+                  `ports.${portIndex}.modbusSlaves.${slaveIndex}.polling.timeoutMs`
                 )}
               />
               <TextInput
-                label="Data Type"
+                label="Retries"
+                type="number"
                 {...register(
-                  `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.dataType`
-                )}
-              />
-              <TextInput
-                label="Tag"
-                {...register(
-                  `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.tag`
-                )}
-              />
-              <TextInput
-                label="Bits to read"
-                {...register(
-                  `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.bitsToRead`
+                  `ports.${portIndex}.modbusSlaves.${slaveIndex}.polling.retries`
                 )}
               />
             </CardContent>
           </Card>
-        ))}
+        </div>
 
-        <button
-          type="button"
-          className="btn btn-outline btn-sm"
-          onClick={() =>
-            addRead({
-              readId: "",
-              slaveId: "",
-              portKey: "",
-              unit: "",
-              scaling: 1,
-              offset: 0,
-              name: "",
-              functionCode: "fc_3",
-              startAddress: 0,
-              bitsToRead: 1,
-            })
-          }
-        >
-          + Add Read
-        </button>
+        {/* Reads */}
+        <div className="space-y-3">
+          {fields.map((_, readIndex) => (
+            <Card key={readIndex}>
+              <CardTitle className="flex justify-between">
+                Read {readIndex + 1}
+                <button onClick={() => remove(readIndex)}>
+                  <Trash2 size={16} color="#fa0000" />
+                </button>
+              </CardTitle>
+              <CardContent className="grid md:grid-cols-3 gap-3">
+                <TextInput
+                  label="startAddress"
+                  {...register(
+                    `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.startAddress`
+                  )}
+                />
+                <TextInput
+                  label="Name"
+                  {...register(
+                    `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.name`
+                  )}
+                />
+                <TextInput
+                  label="Unit"
+                  {...register(
+                    `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.unit`
+                  )}
+                />
+                <TextInput
+                  label="Scaling"
+                  type="number"
+                  {...register(
+                    `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.scaling`
+                  )}
+                />
+                <TextInput
+                  label="Offset"
+                  type="number"
+                  {...register(
+                    `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.offset`
+                  )}
+                />
+                <TextInput
+                  label="Data Type"
+                  {...register(
+                    `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.dataType`
+                  )}
+                />
+                <TextInput
+                  label="Tag"
+                  {...register(
+                    `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.tag`
+                  )}
+                />
+                <TextInput
+                  label="Bits to read"
+                  {...register(
+                    `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.bitsToRead`
+                  )}
+                />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
 
-        <button
-          type="button"
-          className="btn btn-danger btn-xs mt-2"
-          onClick={onRemove}
-        >
-          Remove Slave
-        </button>
+        <div className="flex gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              append({
+                readId: "",
+                slaveId: "",
+                portKey: "",
+                unit: "",
+                scaling: 1,
+                offset: 0,
+                name: "",
+                functionCode: "fc_3",
+                startAddress: 0,
+                bitsToRead: 1,
+              })
+            }
+          >
+            + Add Read
+          </Button>
+
+          <Button type="button" variant="danger" size="sm" onClick={onRemove}>
+            <Trash2 size={16} /> Remove Slave
+          </Button>
+        </div>
       </div>
     </details>
   );
