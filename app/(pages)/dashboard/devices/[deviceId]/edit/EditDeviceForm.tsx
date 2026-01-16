@@ -14,7 +14,7 @@ import { TextInput } from "@/app/_components/Inputs/TextInput";
 import Button from "@/app/_components/Button/Button";
 
 import { IPortGroupWithIndex, PortGroup } from "./components/PortGroup";
-import { ModbusPortsSection } from "./components/ModbusPortsSection";
+import { ModbusPortsSection } from "./components/modbus/ModbusPortsSection";
 import {
   IDevice,
   IPort,
@@ -141,6 +141,7 @@ export function EditDeviceForm({ deviceId }: { deviceId: string }) {
                 register={register}
               />
               <ModbusPortsSection
+                control={form.control}
                 ports={filterPortsByPrefix(device?.ports, "MI")}
                 register={register}
               />

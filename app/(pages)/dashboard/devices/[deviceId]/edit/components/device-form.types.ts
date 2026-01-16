@@ -1,66 +1,32 @@
-export type DeviceStatus = "online" | "offline" | "maintenance";
-export type PortKind = "DI" | "AI" | "MI";
+import {
+  IDevice,
+  IModbusRead,
+  IModbusSlave,
+  IPort,
+} from "@/app/_lib/_react-query-hooks/device/devices.types";
 
-export interface DeviceFormValues {
-  name: string;
-  status: DeviceStatus;
-  pointOfContact: string;
-  alertEmails: string[];
-  alertPhones: string[];
-  metadata: Record<string, string | undefined>;
-  location: {
-    lat: number;
-    lng: number;
-    address: string;
-  };
-  ports: PortForm[];
-}
+export type IModbusReadForm = Omit<
+  IModbusRead,
+  "readId" | "slaveId" | "portKey"
+> & {
+  readId?: string; // optional for new reads
+  slaveId?: string;
+  portKey?: string;
+};
 
-export interface PortForm {
-  portKey: string;
-  name: string;
-  portType: {
-    code: PortKind;
-  };
-  status: string;
-  unit?: string;
-  calibrationValue?: {
-    scaling: number;
-    offset: number;
-  };
-  thresholds?: {
-    min?: number;
-    max?: number;
-    message?: string;
-  };
-  modbusSlaves?: ModbusSlaveForm[];
-}
+export type IModbusSlaveForm = Omit<
+  IModbusSlave,
+  "slaveId" | "portKey" | "reads"
+> & {
+  slaveId?: string; // optional for new slaves
+  portKey?: string;
+  reads: IModbusReadForm[];
+};
 
-export interface ModbusSlaveForm {
-  slaveId: string;
-  name: string;
-  serial: {
-    baudRate: number;
-    dataBits: number;
-    stopBits: number;
-    parity: "none" | "even" | "odd";
-  };
-  polling: {
-    intervalMs: number;
-    timeoutMs: number;
-    retries: number;
-  };
-  reads: ModbusReadForm[];
-}
+export type IPortForm = Omit<IPort, "modbusSlaves"> & {
+  modbusSlaves?: IModbusSlaveForm[];
+};
 
-export interface ModbusReadForm {
-  readId: string;
-  name: string;
-  description?: string;
-  scaling: number;
-  offset: number;
-  unit?: string;
-  tag?: string;
-  dataType?: string;
-  endianness?: "ABCD" | "CDAB" | "BADC" | "DCBA" | "NONE";
-}
+export type IDeviceForm = Omit<IDevice, "ports"> & {
+  ports: IPortForm[];
+};
