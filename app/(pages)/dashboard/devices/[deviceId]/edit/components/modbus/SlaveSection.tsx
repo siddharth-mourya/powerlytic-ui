@@ -1,10 +1,137 @@
 import { AccordionHeader } from "@/app/_components/Accordion/AccordionHeader";
 import Button from "@/app/_components/Button/Button";
 import { Card, CardContent, CardTitle } from "@/app/_components/Card/Card";
+import { FormField } from "@/app/_components/Inputs/FormField";
+import { Select } from "@/app/_components/Inputs/Select";
 import { TextInput } from "@/app/_components/Inputs/TextInput";
-import { IDevice } from "@/app/_lib/_react-query-hooks/device/devices.types";
-import { Delete, DeleteIcon, Trash, Trash2 } from "lucide-react";
-import { Control, useFieldArray, UseFormRegister } from "react-hook-form";
+import {
+  FUNCTION_CODE_OPTIONS,
+  IDevice,
+} from "@/app/_lib/_react-query-hooks/device/devices.types";
+import { Trash2 } from "lucide-react";
+import {
+  Control,
+  useFieldArray,
+  UseFormRegister,
+  useWatch,
+} from "react-hook-form";
+
+// Determine available bit options based on function code
+function getBitsToReadOptions(functionCode: string) {
+  if (functionCode === "fc_1" || functionCode === "fc_2") {
+    // Coil (FC01) and Discrete Input (FC02) only support 1-bit
+    return [{ label: "1", value: "1" }];
+  }
+  // Holding Register (FC03) and Input Register (FC04) support 16, 32, 64-bit
+  return [
+    { label: "16", value: "16" },
+    { label: "32", value: "32" },
+    { label: "64", value: "64" },
+  ];
+}
+
+// Separate component for each read card to enable useWatch per read
+interface ReadCardProps {
+  portIndex: number;
+  slaveIndex: number;
+  readIndex: number;
+  control: Control<IDevice>;
+  register: UseFormRegister<IDevice>;
+  onRemove: () => void;
+}
+
+function ReadCard({
+  portIndex,
+  slaveIndex,
+  readIndex,
+  control,
+  register,
+  onRemove,
+}: ReadCardProps) {
+  const fieldPath = ``;
+
+  // Watch the functionCode field to dynamically update bit options
+  const functionCode = useWatch({
+    control,
+    name: `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.functionCode`,
+  });
+
+  const bitsToReadOptions = getBitsToReadOptions(functionCode);
+
+  return (
+    <Card>
+      <CardTitle className="flex justify-between">
+        Read {readIndex + 1}
+        <button onClick={onRemove}>
+          <Trash2 size={16} color="#fa0000" />
+        </button>
+      </CardTitle>
+      <CardContent className="grid md:grid-cols-3 gap-3">
+        <TextInput
+          label="Start Address"
+          {...register(
+            `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.startAddress`,
+          )}
+        />
+        <TextInput
+          label="Name"
+          {...register(
+            `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.name`,
+          )}
+        />
+        <TextInput
+          label="Unit"
+          {...register(
+            `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.unit`,
+          )}
+        />
+        <TextInput
+          label="Scaling"
+          type="number"
+          {...register(
+            `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.scaling`,
+          )}
+        />
+        <TextInput
+          label="Offset"
+          type="number"
+          {...register(
+            `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.offset`,
+          )}
+        />
+        <TextInput
+          label="Data Type"
+          {...register(
+            `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.dataType`,
+          )}
+        />
+        <TextInput
+          label="Tag"
+          {...register(
+            `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.tag`,
+          )}
+        />
+        <FormField label="Function Code">
+          <Select
+            {...register(
+              `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.functionCode`,
+            )}
+            options={FUNCTION_CODE_OPTIONS}
+          />
+        </FormField>
+
+        <FormField label="Bits to read">
+          <Select
+            {...register(
+              `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.bitsToRead`,
+            )}
+            options={bitsToReadOptions}
+          />
+        </FormField>
+      </CardContent>
+    </Card>
+  );
+}
 
 export function SlaveSection({
   portIndex,
@@ -36,28 +163,28 @@ export function SlaveSection({
             <CardContent className="grid grid-cols-2 gap-2">
               <TextInput
                 {...register(
-                  `ports.${portIndex}.modbusSlaves.${slaveIndex}.serial.baudRate`
+                  `ports.${portIndex}.modbusSlaves.${slaveIndex}.serial.baudRate`,
                 )}
                 label="Baud Rate"
                 type="number"
               />
               <TextInput
                 {...register(
-                  `ports.${portIndex}.modbusSlaves.${slaveIndex}.serial.dataBits`
+                  `ports.${portIndex}.modbusSlaves.${slaveIndex}.serial.dataBits`,
                 )}
                 label="Data Bits"
                 type="number"
               />
               <TextInput
                 {...register(
-                  `ports.${portIndex}.modbusSlaves.${slaveIndex}.serial.stopBits`
+                  `ports.${portIndex}.modbusSlaves.${slaveIndex}.serial.stopBits`,
                 )}
                 label="Stop Bits"
                 type="number"
               />
               <TextInput
                 {...register(
-                  `ports.${portIndex}.modbusSlaves.${slaveIndex}.serial.parity`
+                  `ports.${portIndex}.modbusSlaves.${slaveIndex}.serial.parity`,
                 )}
                 label="Parity"
               />
@@ -71,21 +198,21 @@ export function SlaveSection({
                 label="Interval (ms)"
                 type="number"
                 {...register(
-                  `ports.${portIndex}.modbusSlaves.${slaveIndex}.polling.intervalMs`
+                  `ports.${portIndex}.modbusSlaves.${slaveIndex}.polling.intervalMs`,
                 )}
               />
               <TextInput
                 label="Timeout (ms)"
                 type="number"
                 {...register(
-                  `ports.${portIndex}.modbusSlaves.${slaveIndex}.polling.timeoutMs`
+                  `ports.${portIndex}.modbusSlaves.${slaveIndex}.polling.timeoutMs`,
                 )}
               />
               <TextInput
                 label="Retries"
                 type="number"
                 {...register(
-                  `ports.${portIndex}.modbusSlaves.${slaveIndex}.polling.retries`
+                  `ports.${portIndex}.modbusSlaves.${slaveIndex}.polling.retries`,
                 )}
               />
             </CardContent>
@@ -95,66 +222,15 @@ export function SlaveSection({
         {/* Reads */}
         <div className="space-y-3">
           {fields.map((_, readIndex) => (
-            <Card key={readIndex}>
-              <CardTitle className="flex justify-between">
-                Read {readIndex + 1}
-                <button onClick={() => remove(readIndex)}>
-                  <Trash2 size={16} color="#fa0000" />
-                </button>
-              </CardTitle>
-              <CardContent className="grid md:grid-cols-3 gap-3">
-                <TextInput
-                  label="startAddress"
-                  {...register(
-                    `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.startAddress`
-                  )}
-                />
-                <TextInput
-                  label="Name"
-                  {...register(
-                    `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.name`
-                  )}
-                />
-                <TextInput
-                  label="Unit"
-                  {...register(
-                    `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.unit`
-                  )}
-                />
-                <TextInput
-                  label="Scaling"
-                  type="number"
-                  {...register(
-                    `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.scaling`
-                  )}
-                />
-                <TextInput
-                  label="Offset"
-                  type="number"
-                  {...register(
-                    `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.offset`
-                  )}
-                />
-                <TextInput
-                  label="Data Type"
-                  {...register(
-                    `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.dataType`
-                  )}
-                />
-                <TextInput
-                  label="Tag"
-                  {...register(
-                    `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.tag`
-                  )}
-                />
-                <TextInput
-                  label="Bits to read"
-                  {...register(
-                    `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.bitsToRead`
-                  )}
-                />
-              </CardContent>
-            </Card>
+            <ReadCard
+              key={readIndex}
+              readIndex={readIndex}
+              slaveIndex={slaveIndex}
+              portIndex={portIndex}
+              control={control}
+              register={register}
+              onRemove={() => remove(readIndex)}
+            />
           ))}
         </div>
 
@@ -174,7 +250,7 @@ export function SlaveSection({
                 name: "",
                 functionCode: "fc_3",
                 startAddress: 0,
-                bitsToRead: 1,
+                bitsToRead: 16,
               })
             }
           >

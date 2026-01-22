@@ -33,12 +33,8 @@ export default function DeviceListPage() {
       cell: ({ row }) => {
         return (
           <Link
-            href={`/dashboard/devices/${row.original._id}`}
+            href={`/dashboard/devices/${row.original._id}/values`}
             className="link link-info"
-            onClick={(e) => {
-              e.preventDefault();
-              router.push(`/dashboard/devices/${row.original._id}`);
-            }}
           >
             {row.original.name}
           </Link>

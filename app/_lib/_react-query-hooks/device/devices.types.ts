@@ -163,3 +163,24 @@ export interface IDeviceResponse {
   data: IDevice;
   message?: string;
 }
+
+export enum FUNCTION_CODE {
+  fc_1 = "fc_1",
+  fc_2 = "fc_2",
+  fc_3 = "fc_3",
+  fc_4 = "fc_4",
+}
+
+export const FUNCTION_CODE_OPTIONS = [
+  { label: "Read Coils (FC 1)", value: FUNCTION_CODE.fc_1 },
+  { label: "Read Discrete Inputs (FC 2)", value: FUNCTION_CODE.fc_2 },
+  { label: "Read Holding Registers (FC 3)", value: FUNCTION_CODE.fc_3 },
+  { label: "Read Input Registers (FC 4)", value: FUNCTION_CODE.fc_4 },
+];
+
+export const BITS_TO_READ_OPTIONS = [
+  { label: "8", value: "8" },
+  { label: "16", value: "16" },
+  { label: "32", value: "32" },
+  { label: "64", value: "64" },
+];

@@ -25,12 +25,12 @@ import {
  */
 function filterPortsByPrefix(
   ports: IPort[] | undefined,
-  prefix: string
+  prefix: string,
 ): IPortGroupWithIndex {
   if (!ports) return [];
   return ports
     .map((p, idx) =>
-      p.portKey.startsWith(prefix) ? { ...p, originalIndex: idx } : null
+      p.portKey.startsWith(prefix) ? { ...p, originalIndex: idx } : null,
     )
     .filter((p): p is IPort & { originalIndex: number } => p !== null);
 }
@@ -97,6 +97,7 @@ export function EditDeviceForm({ deviceId }: { deviceId: string }) {
     });
   };
 
+  console.log("Rendering EditDeviceForm", { device, isLoading });
   if (isLoading) return <p>Loading...</p>;
 
   return (
