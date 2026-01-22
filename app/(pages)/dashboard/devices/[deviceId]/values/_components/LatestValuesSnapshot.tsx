@@ -13,8 +13,8 @@ import {
   IValue,
   IValuesListResponse,
 } from "@/app/_lib/_react-query-hooks/values/values.types";
-import { Loader2, Activity } from "lucide-react";
-import { useMemo } from "react";
+import { Loader2, Activity, Info } from "lucide-react";
+import { useMemo, useState } from "react";
 
 interface LatestValuesSnapshotProps {
   deviceId: string;
@@ -35,6 +35,48 @@ interface PortSnapshot {
     slaveId: string;
     name: string;
   };
+}
+
+// Simple tooltip info component
+function ModbusInfoTooltip({
+  slaveId,
+  readId,
+  portKey,
+}: {
+  slaveId: string;
+  readId: string;
+  portKey: string;
+}) {
+  const [isVisible, setIsVisible] = useState(false);
+
+  return (
+    <div className="relative inline-block">
+      <button
+        className="ml-2 p-1 rounded-full hover:bg-amber-100 text-amber-700 flex-shrink-0"
+        onMouseEnter={() => setIsVisible(true)}
+        onMouseLeave={() => setIsVisible(false)}
+        onClick={() => setIsVisible(!isVisible)}
+      >
+        <Info size={14} />
+      </button>
+      {isVisible && (
+        <div className="absolute bottom-full right-0 mb-2 w-48 bg-gray-900 text-white text-xs rounded-lg p-3 shadow-lg z-50 mb-2">
+          <div className="space-y-1">
+            <p>
+              <span className="font-semibold">Slave ID:</span> {slaveId}
+            </p>
+            <p>
+              <span className="font-semibold">Read ID:</span> {readId}
+            </p>
+            <p>
+              <span className="font-semibold">Port Key:</span> {portKey}
+            </p>
+          </div>
+          <div className="absolute top-full right-2 w-2 h-2 bg-gray-900 transform rotate-45"></div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function LatestValuesSnapshot({
@@ -66,6 +108,8 @@ export default function LatestValuesSnapshot({
           name: value.modbusRead.name || value.modbusRead.tag,
         };
       }
+
+      console.log("Value:", value, "Port:", port);
 
       return {
         portKey: value.port.portKey,
@@ -221,53 +265,81 @@ export default function LatestValuesSnapshot({
         </div>
       )}
 
-      {/* Modbus Inputs - Compact */}
+      {/* Modbus Inputs - Grouped by Slave */}
       {modbusPorts.length > 0 && (
         <div>
           <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
             🔧 <span>Modbus</span>
           </h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {modbusPorts.map((port) => (
-              <div
-                key={port.portKey}
-                className="p-3 border border-amber-200 rounded-lg bg-amber-50 hover:shadow-sm transition-shadow"
-              >
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-gray-700">
-                      {port.portKey}
-                      {port.modbusRead && (
-                        <span className="text-gray-500 ml-1">
-                          (Slave {port.modbusRead.slaveId} •{" "}
-                          {port.modbusRead.name})
-                        </span>
-                      )}
-                    </p>
-                    <p className="text-sm font-semibold text-gray-900 truncate">
-                      {port.name}
-                    </p>
+          {(() => {
+            // Group by slaveId
+            const groupedBySlave = modbusPorts.reduce(
+              (acc, port) => {
+                const slaveId = port.modbusRead?.slaveId || "unknown";
+                if (!acc[slaveId]) {
+                  acc[slaveId] = [];
+                }
+                acc[slaveId].push(port);
+                return acc;
+              },
+              {} as Record<string, typeof modbusPorts>,
+            );
+
+            return (
+              <>
+                {Object.entries(groupedBySlave).map(([slaveId, slavePorts]) => (
+                  <div key={slaveId} className="mb-4">
+                    <h5 className="text-xs font-semibold text-amber-800 mb-2 px-1">
+                      Slave {slaveId}
+                    </h5>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {slavePorts.map((port) => (
+                        <div
+                          key={port.portKey}
+                          className="p-3 border border-amber-200 rounded-lg bg-amber-50 hover:shadow-sm transition-shadow"
+                        >
+                          <div className="flex items-start justify-between mb-2">
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-medium text-gray-700">
+                                {port.modbusRead?.name || port.portKey}
+                              </p>
+                            </div>
+                            <div className="flex items-center flex-shrink-0">
+                              <Badge
+                                variant={getQualityColor(port.quality)}
+                                className="text-xs"
+                              >
+                                {getQualityIcon(port.quality)}
+                              </Badge>
+                              {port.modbusRead && (
+                                <ModbusInfoTooltip
+                                  slaveId={port.modbusRead.slaveId}
+                                  readId={port.modbusRead.readId}
+                                  portKey={port.portKey}
+                                />
+                              )}
+                            </div>
+                          </div>
+                          <div className="pt-2 border-t border-amber-200">
+                            <p className="text-sm font-bold text-gray-900">
+                              {typeof port.value === "number"
+                                ? port.value.toFixed(2)
+                                : port.value || "-"}
+                            </p>
+                            {port.unit && (
+                              <p className="text-xs text-gray-600">
+                                {port.unit}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <Badge
-                    variant={getQualityColor(port.quality)}
-                    className="text-xs ml-2 flex-shrink-0"
-                  >
-                    {getQualityIcon(port.quality)}
-                  </Badge>
-                </div>
-                <div className="pt-2 border-t border-amber-200">
-                  <p className="text-sm font-bold text-gray-900">
-                    {typeof port.value === "number"
-                      ? port.value.toFixed(2)
-                      : port.value || "-"}
-                  </p>
-                  {port.unit && (
-                    <p className="text-xs text-gray-600">{port.unit}</p>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
+                ))}
+              </>
+            );
+          })()}
         </div>
       )}
 

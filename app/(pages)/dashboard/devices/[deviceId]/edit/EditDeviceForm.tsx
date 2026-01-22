@@ -1,24 +1,24 @@
 "use client";
 
-import { useEffect } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import Button from "@/app/_components/Button/Button";
+import { Card, CardContent, CardTitle } from "@/app/_components/Card/Card";
+import { TextInput } from "@/app/_components/Inputs/TextInput";
+import { SectionWrapper } from "@/app/_components/SectionWrapper/SectionWrapper";
 import {
   useDeviceByIdRQ,
   useUpdateDeviceMutation,
 } from "@/app/_lib/_react-query-hooks/device/useDevicesRQ";
-import { SectionWrapper } from "@/app/_components/SectionWrapper/SectionWrapper";
 import { RoleProtectedGuard } from "@/app/_lib/utils/rbac/RoleProtectedGuard";
 import { Actions, Resources } from "@/app/_lib/utils/rbac/resources";
-import { Card, CardContent, CardTitle } from "@/app/_components/Card/Card";
-import { TextInput } from "@/app/_components/Inputs/TextInput";
-import Button from "@/app/_components/Button/Button";
+import { useEffect } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
 
-import { IPortGroupWithIndex, PortGroup } from "./components/PortGroup";
-import { ModbusPortsSection } from "./components/modbus/ModbusPortsSection";
 import {
   IDevice,
   IPort,
 } from "@/app/_lib/_react-query-hooks/device/devices.types";
+import { IPortGroupWithIndex, PortGroup } from "./components/PortGroup";
+import { ModbusPortsSection } from "./components/modbus/ModbusPortsSection";
 
 /**
  * Filter and map ports by key prefix, preserving original indices
@@ -79,13 +79,13 @@ export function EditDeviceForm({ deviceId }: { deviceId: string }) {
     if (device) reset(device);
   }, [device, reset]);
 
-  const onSubmit = (values: IDevice) => {
+  const onSubmit = async (values: IDevice) => {
     console.log("Submitting", values);
     if (Object.keys(errors).length > 0) {
       console.warn("Form has validation errors:", errors);
       return;
     }
-    updateDevice.mutate({
+    await updateDevice.mutate({
       name: values.name,
       status: values.status,
       pointOfContact: values.pointOfContact,
@@ -206,9 +206,13 @@ export function EditDeviceForm({ deviceId }: { deviceId: string }) {
             </CardContent>
           </Card>
 
-          <div className="flex justify-end">
-            <Button type="submit">Save Changes</Button>
-          </div>
+          <Button
+            disabled={!form.formState.isDirty}
+            type="submit"
+            loading={updateDevice.isPending}
+          >
+            Save Changes
+          </Button>
         </form>
       </SectionWrapper>
     </RoleProtectedGuard>

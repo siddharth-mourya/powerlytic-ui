@@ -2,6 +2,7 @@ import { api } from "@/app/_lib/api/axios";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "../queryKeys";
 import { IDevice, IDeviceUpdateInput } from "./devices.types";
+import { toast } from "react-toastify";
 
 // -----------------------------
 // 🔹 List All Devices
@@ -78,12 +79,16 @@ export const useCreateDeviceMutation = () => {
       return res.data as IDevice;
     },
     onSuccess: () => {
+      toast.success("Device created successfully");
       queryClient.invalidateQueries({
         queryKey: [queryKeys.devices.listAllByOrgId],
       });
       queryClient.invalidateQueries({
         queryKey: [queryKeys.devices.listAll],
       });
+    },
+    onError: () => {
+      toast.error("Failed to create device");
     },
   });
 };
@@ -102,6 +107,7 @@ export const useUpdateDeviceMutation = (id: string) => {
       return res.data as IDevice;
     },
     onSuccess: () => {
+      toast.success("Device updated successfully");
       queryClient.invalidateQueries({
         queryKey: [queryKeys.devices.listAllByOrgId],
       });
@@ -109,6 +115,9 @@ export const useUpdateDeviceMutation = (id: string) => {
         queryKey: [queryKeys.devices.listAll],
       });
       queryClient.invalidateQueries({ queryKey: [queryKeys.devices.byId, id] });
+    },
+    onError: () => {
+      toast.error("Failed to update device");
     },
   });
 };
@@ -128,12 +137,16 @@ export const useUpdateDeviceOrgRQ = (deviceId: string) => {
       return res.data as IDevice;
     },
     onSuccess: () => {
+      toast.success("Device organization updated successfully");
       queryClient.invalidateQueries({
         queryKey: [queryKeys.devices.listAll],
       });
       queryClient.invalidateQueries({
         queryKey: [queryKeys.devices.byId, deviceId],
       });
+    },
+    onError: () => {
+      toast.error("Failed to update device organization");
     },
   });
 };
@@ -154,6 +167,13 @@ export const useDeleteDeviceMutation = () => {
       queryClient.invalidateQueries({
         queryKey: [queryKeys.devices.listAllByOrgId],
       });
+      queryClient.invalidateQueries({
+        queryKey: [queryKeys.devices.listAll],
+      });
+      toast.success("Device deleted successfully");
+    },
+    onError: () => {
+      toast.error("Failed to delete device");
     },
   });
 };
