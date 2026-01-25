@@ -249,10 +249,8 @@ export const useDeployConfigMutation = (deviceId: string) => {
         queryKey: [queryKeys.devices.deploymentStatus, deviceId],
       });
     },
-    onError: (error: any) => {
-      const errorMessage =
-        error?.response?.data?.message || "Failed to deploy configuration";
-      toast.error(errorMessage);
+    onError: () => {
+      toast.error("Failed to deploy configuration");
     },
   });
 };

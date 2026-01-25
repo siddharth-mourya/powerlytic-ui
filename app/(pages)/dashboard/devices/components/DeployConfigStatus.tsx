@@ -179,7 +179,7 @@ function StatusBox({
         <div>
           <p className="font-medium">Ready to Deploy</p>
           <p className="text-xs">
-            Click "Deploy Configuration" to send configuration to device.
+            Click 'Deploy Configuration' to send configuration to device.
           </p>
         </div>
       </div>
