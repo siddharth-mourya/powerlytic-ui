@@ -156,6 +156,11 @@ export function SlaveSection({
       <AccordionHeader title={`Slave ${slaveIndex + 1}`} />
 
       <div className="space-y-4 p-4">
+        <TextInput
+          {...register(`ports.${portIndex}.modbusSlaves.${slaveIndex}.slaveId`)}
+          label="Slave Id"
+          type="number"
+        />
         {/* Serial + Polling */}
         <div className="grid grid-cols-2 gap-4">
           <Card>
