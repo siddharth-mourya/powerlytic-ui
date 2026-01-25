@@ -27,12 +27,14 @@ import {
   MapPin,
   Network,
   PencilIcon,
+  SendIcon,
   Settings,
   Smartphone,
   SmartphoneIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { DeployConfigStatus } from "../components/DeployConfigStatus";
 
 interface DeviceDetailsPageProps {
   deviceId: string;
@@ -52,12 +54,13 @@ export function DeviceDetails({ deviceId }: DeviceDetailsPageProps) {
   });
 
   const [selectedOrg, setSelectedOrg] = useState("");
+  const [isDeployDrawerOpen, setIsDeployDrawerOpen] = useState(false);
   const updateOrgMutation = useUpdateDeviceOrgRQ(deviceId);
 
   const handleAssociateOrg = async () => {
     if (!selectedOrg) return;
     const confirmed = confirm(
-      "⚠️ Associating this device to an organization is sensitive. Proceed?"
+      "⚠️ Associating this device to an organization is sensitive. Proceed?",
     );
     if (!confirmed) return;
     updateOrgMutation.mutate({ organizationId: selectedOrg });
@@ -101,6 +104,12 @@ export function DeviceDetails({ deviceId }: DeviceDetailsPageProps) {
               }
             >
               Simulate Values <Settings className="w-3 h-3" />
+            </button>
+            <button
+              className="btn btn-sm btn-secondary"
+              onClick={() => setIsDeployDrawerOpen(!isDeployDrawerOpen)}
+            >
+              Deploy Config <SendIcon className="w-3 h-3" />
             </button>
             <button
               className="btn btn-sm btn-primary"
@@ -266,6 +275,50 @@ export function DeviceDetails({ deviceId }: DeviceDetailsPageProps) {
           </CardContent>
         </Card>
       </SectionWrapper>
+
+      {/* Deploy Config Drawer */}
+      <div className="drawer">
+        <input
+          id="deploy-drawer"
+          type="checkbox"
+          className="drawer-toggle"
+          checked={isDeployDrawerOpen}
+          onChange={(e) => setIsDeployDrawerOpen(e.target.checked)}
+        />
+        <div className="drawer-side z-50">
+          <label
+            htmlFor="deploy-drawer"
+            aria-label="close sidebar"
+            className="drawer-overlay"
+            onClick={() => setIsDeployDrawerOpen(false)}
+          ></label>
+          <div className="w-80 min-h-full bg-base-200 text-base-content flex flex-col">
+            {/* Header with close button */}
+            <div className="flex items-center justify-between p-4 border-b border-base-300">
+              <h2 className="text-lg font-semibold">Deploy Configuration</h2>
+              <button
+                className="btn btn-ghost btn-sm btn-circle"
+                onClick={() => setIsDeployDrawerOpen(false)}
+                aria-label="Close drawer"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto p-4">
+              <div className="space-y-4">
+                <DeployConfigStatus
+                  deviceId={device._id || ""}
+                  deviceName={device.name}
+                  lastUpdated={device.updatedAt}
+                  onClose={() => setIsDeployDrawerOpen(false)}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </RoleProtectedGuard>
   );
 }

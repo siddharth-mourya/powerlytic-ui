@@ -23,6 +23,7 @@ export const queryKeys = {
     listAll: "devices-list-all",
     listAllByOrgId: "devices-list-all-by-org",
     byId: "device-by-id",
+    deploymentStatus: "device-deployment-status",
   },
   values: {
     list: "values-list",

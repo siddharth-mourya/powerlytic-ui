@@ -177,3 +177,60 @@ export const useDeleteDeviceMutation = () => {
     },
   });
 };
+
+// ===============================
+// 🔹 Deployment Status & Config
+// ===============================
+
+export interface DeploymentStatus {
+  status: "pending" | "sent" | "applied" | "error";
+  errorMessage?: string;
+  sentAt?: string;
+  savedAt?: string;
+}
+
+export const useDeploymentStatusRQ = (
+  deviceId: string,
+  enabled: boolean = false,
+) => {
+  const getDeploymentStatus = async () => {
+    const res = await api.get(`/device/${deviceId}/deployment-status`);
+    if (res.status !== 200)
+      throw new Error("Failed to fetch deployment status");
+    return res.data as DeploymentStatus;
+  };
+
+  return useQuery<DeploymentStatus>({
+    queryKey: [queryKeys.devices.deploymentStatus, deviceId],
+    queryFn: getDeploymentStatus,
+    refetchInterval: enabled ? 5000 : false, // Poll every 5 second when enabled
+    enabled: enabled && !!deviceId,
+    retry: 1,
+    staleTime: 0, // Always treat data as stale during polling
+  });
+};
+
+export const useDeployConfigMutation = (deviceId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      const res = await api.post(`/device/${deviceId}/deploy`);
+      if (res.status !== 200 && res.status !== 201)
+        throw new Error("Failed to deploy configuration");
+      return res.data;
+    },
+    onSuccess: () => {
+      toast.success("Deployment initiated successfully");
+      // Immediately invalidate and refetch deployment status
+      queryClient.invalidateQueries({
+        queryKey: [queryKeys.devices.deploymentStatus, deviceId],
+      });
+    },
+    onError: (error: any) => {
+      const errorMessage =
+        error?.response?.data?.message || "Failed to deploy configuration";
+      toast.error(errorMessage);
+    },
+  });
+};
