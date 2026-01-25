@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import {
-  useDeploymentStatusRQ,
   useDeployConfigMutation,
-  DeploymentStatus,
+  useDeploymentStatusRQ,
+  useDeploymentStatusUpdateRQ,
+  useDeviceByIdRQ,
 } from "@/app/_lib/_react-query-hooks/device/useDevicesRQ";
+import { AlertCircle, CheckCircle, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 // Status constants - match backend deployment service
 export const DEPLOY_STATUS = {
@@ -44,25 +45,27 @@ export function DeployConfigStatus({
     deviceId,
     fetchStatusEnabled,
   );
-
+  const { data: device } = useDeviceByIdRQ(deviceId);
   const { mutate: deployConfigMutation } = useDeployConfigMutation(deviceId);
+  const { mutate: updateDeploymentStatus } =
+    useDeploymentStatusUpdateRQ(deviceId);
 
   // Update local status based on backend response
   useEffect(() => {
-    console.log("Deploy status data:", deployStatusData);
     if (deployStatusData?.status) {
       setStatus(deployStatusData.status);
-      setErrorMessage(deployStatusData.errorMessage);
+      setErrorMessage(deployStatusData.message);
 
       // Stop polling when completed
       if (
         deployStatusData.status === DEPLOY_STATUS.SAVED ||
         deployStatusData.status === DEPLOY_STATUS.ERROR
       ) {
-        console.log(
-          "Deployment completed with status:",
-          deployStatusData.status,
-        );
+        updateDeploymentStatus({
+          status: DEPLOY_STATUS.PENDING,
+          configId: device?.configId,
+          message: "waiting for deployment",
+        });
         setIsDeploying(false);
       }
     }

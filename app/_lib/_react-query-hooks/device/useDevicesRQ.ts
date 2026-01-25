@@ -184,7 +184,8 @@ export const useDeleteDeviceMutation = () => {
 
 export interface DeploymentStatus {
   status: "pending" | "sent" | "applied" | "error";
-  errorMessage?: string;
+  configId?: string;
+  message?: string;
   sentAt?: string;
   savedAt?: string;
 }
@@ -207,6 +208,27 @@ export const useDeploymentStatusRQ = (
     enabled: enabled && !!deviceId,
     retry: 1,
     staleTime: 0, // Always treat data as stale during polling
+  });
+};
+
+export const useDeploymentStatusUpdateRQ = (deviceId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: DeploymentStatus) => {
+      const res = await api.put(`/device/${deviceId}/deployment-status`, data);
+      if (res.status !== 200)
+        throw new Error("Failed to update deployment status");
+      return res.data as DeploymentStatus;
+    },
+    // onSuccess: () => {
+    //   queryClient.invalidateQueries({
+    //     queryKey: [queryKeys.devices.deploymentStatus, deviceId],
+    //   });
+    // },
+    // onError: () => {
+    //   toast.error("Failed to update deployment status");
+    // },
   });
 };
 
