@@ -9,12 +9,14 @@ export function AccordionHeader({
   subtitle?: string;
 }) {
   return (
-    <summary className="flex cursor-pointer items-center justify-between rounded-md bg-gray-50 px-4 py-3 hover:bg-gray-100 transition">
-      <div>
-        <div className="font-semibold text-gray-800">{title}</div>
-        {subtitle && <div className="text-xs text-gray-500">{subtitle}</div>}
+    <summary className="flex cursor-pointer items-center justify-between gap-4 rounded-lg bg-base-200 px-5 py-3.5 hover:bg-base-300 transition-colors group marker:content-none">
+      <div className="flex-1">
+        <div className="font-bold text-base text-base-content">{title}</div>
+        {subtitle && (
+          <div className="text-xs text-base-content/60 mt-0.5">{subtitle}</div>
+        )}
       </div>
-      <ChevronDown className="h-4 w-4 text-gray-500 transition-transform group-open:rotate-180" />
+      <ChevronDown className="h-5 w-5 text-base-content/60 transition-transform duration-200 group-open:rotate-180 flex-shrink-0" />
     </summary>
   );
 }

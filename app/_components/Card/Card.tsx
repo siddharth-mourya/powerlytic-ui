@@ -10,8 +10,8 @@ export const Card = ({
 }) => (
   <div
     className={classNames(
-      "bg-base-100 border border-base-300 rounded-2xl shadow-sm p-4",
-      className
+      "bg-base-100 border border-base-300 rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-200",
+      className,
     )}
   >
     {children}
@@ -27,8 +27,8 @@ export const CardHeader = ({
 }) => (
   <div
     className={classNames(
-      "mb-3 pb-2 flex items-center justify-between",
-      className
+      "mb-4 pb-4 flex items-center justify-between border-b border-base-300",
+      className,
     )}
   >
     {children}
@@ -42,9 +42,7 @@ export const CardTitle = ({
   children: ReactNode;
   className?: string;
 }) => (
-  <h2
-    className={classNames("text-lg font-semibold text-base-content", className)}
-  >
+  <h2 className={classNames("text-xl font-bold text-base-content", className)}>
     {children}
   </h2>
 );

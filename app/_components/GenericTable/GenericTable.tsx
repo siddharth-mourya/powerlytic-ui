@@ -11,6 +11,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { useState } from "react";
+import { ChevronUp, ChevronDown, Search } from "lucide-react";
 
 type GenericTableProps<TData extends object> = {
   data: TData[];
@@ -46,52 +47,74 @@ export function GenericTable<TData extends object>({
   });
 
   return (
-    <div>
-      {/* 🔍 Global Filter */}
-      <div className="mb-4 flex justify-between items-center">
-        <input
-          type="text"
-          placeholder="Search..."
-          value={globalFilter ?? ""}
-          onChange={(e) => setGlobalFilter(e.target.value)}
-          className="input input-bordered w-full max-w-xs"
-        />
+    <div className="space-y-4">
+      {/* Search Filter */}
+      <div className="flex gap-2">
+        <div className="relative flex-1 max-w-xs">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-base-content/40" />
+          <input
+            type="text"
+            placeholder="Search..."
+            value={globalFilter ?? ""}
+            onChange={(e) => setGlobalFilter(e.target.value)}
+            className="input input-bordered w-full pl-10 focus:outline-none focus:ring-2 focus:ring-primary/30"
+          />
+        </div>
       </div>
 
-      {/* 📊 Table */}
-      <div className="overflow-x-auto">
-        <table className="table table-zebra w-full border rounded-lg">
-          <thead className="bg-base-200">
+      {/* Table Container */}
+      <div className="overflow-x-auto rounded-lg border border-base-300 shadow-sm">
+        <table className="table w-full">
+          <thead className="bg-base-200 border-b border-base-300">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
                   <th
                     key={header.id}
                     onClick={header.column.getToggleSortingHandler()}
-                    className="cursor-pointer select-none"
+                    className={`px-4 py-3 text-left text-sm font-bold text-base-content cursor-pointer hover:bg-base-300 transition-colors ${
+                      header.column.getCanSort() ? "select-none" : ""
+                    }`}
                   >
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    )}
-                    {{
-                      asc: " 🔼",
-                      desc: " 🔽",
-                    }[header.column.getIsSorted() as string] ?? null}
+                    <div className="flex items-center gap-2">
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
+                      {header.column.getCanSort() && (
+                        <div className="flex-shrink-0">
+                          {header.column.getIsSorted() === "asc" && (
+                            <ChevronUp className="h-4 w-4 text-primary" />
+                          )}
+                          {header.column.getIsSorted() === "desc" && (
+                            <ChevronDown className="h-4 w-4 text-primary" />
+                          )}
+                          {!header.column.getIsSorted() && (
+                            <div className="h-4 w-4 text-base-content/20" />
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </th>
                 ))}
               </tr>
             ))}
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-base-300">
             {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
-                <tr key={row.id}>
+                <tr
+                  key={row.id}
+                  className="hover:bg-base-200 transition-colors duration-150"
+                >
                   {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id}>
+                    <td
+                      key={cell.id}
+                      className="px-4 py-3 text-sm text-base-content"
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </td>
                   ))}
@@ -99,8 +122,11 @@ export function GenericTable<TData extends object>({
               ))
             ) : (
               <tr>
-                <td colSpan={columns.length} className="text-center py-4">
-                  No results found.
+                <td
+                  colSpan={columns.length}
+                  className="px-4 py-8 text-center text-base-content/50 font-medium"
+                >
+                  No results found
                 </td>
               </tr>
             )}
@@ -108,27 +134,31 @@ export function GenericTable<TData extends object>({
         </table>
       </div>
 
-      {/* 📌 Pagination */}
-      <div className="flex items-center justify-between mt-4">
+      {/* Pagination */}
+      <div className="flex items-center justify-between pt-2">
         <div className="flex items-center gap-2">
           <button
-            className="btn btn-sm"
+            className="btn btn-sm btn-outline"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
             Previous
           </button>
           <button
-            className="btn btn-sm"
+            className="btn btn-sm btn-outline"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
             Next
           </button>
         </div>
-        <span>
-          Page <strong>{table.getState().pagination.pageIndex + 1}</strong> of{" "}
-          {table.getPageCount()}
+        <span className="text-sm text-base-content/70 font-medium">
+          Page{" "}
+          <strong className="text-base-content">
+            {table.getState().pagination.pageIndex + 1}
+          </strong>{" "}
+          of{" "}
+          <strong className="text-base-content">{table.getPageCount()}</strong>
         </span>
       </div>
     </div>

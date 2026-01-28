@@ -1,23 +1,22 @@
 "use client";
 
 import { useDeviceModelsListRQ } from "@/app/_lib/_react-query-hooks/deviceModels/useDeviceModelsList";
-import { Clock, Cpu, Eye, Plug } from "lucide-react";
+import { Clock, Cpu, Eye, Plug, Plus } from "lucide-react";
 import DeviceModelListSkeleton from "./DeviceModelListSkeleton";
 import { useRouter } from "next/navigation";
 import { MouseEvent } from "react";
 import Button from "@/app/_components/Button/Button";
+import Link from "next/link";
 
 export const DeviceModelList = () => {
   const { data: deviceModels, isLoading } = useDeviceModelsListRQ();
 
   const router = useRouter();
-  const handleViewClick = (e: MouseEvent<HTMLAnchorElement>, id: string) => {
-    e.preventDefault();
+  const handleViewClick = (id: string) => {
     router.push(`/dashboard/device-models/${id}`);
   };
 
-  const handleNewClick = (e: MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
+  const handleNewClick = () => {
     router.push(`/dashboard/device-models/new`);
   };
 
@@ -25,52 +24,56 @@ export const DeviceModelList = () => {
     return <DeviceModelListSkeleton />;
   }
   return (
-    <div className="flex flex-col gap-4">
-      <div className="self-end">
-        <Button onClick={handleNewClick}>Add New Model</Button>
+    <div className="space-y-6 mt-6">
+      <div className="flex justify-between items-center">
+        <Button
+          leftIcon={<Plus className="h-4 w-4" />}
+          onClick={handleNewClick}
+        >
+          Add New Model
+        </Button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {deviceModels?.map((model) => (
           <div
             key={model._id}
-            className="card bg-base-100 border border-base-200 shadow-sm hover:shadow-lg transition"
+            className="rounded-lg bg-base-100 border border-base-300 shadow-sm hover:shadow-md transition-shadow overflow-hidden"
           >
-            <div className="card-body space-y-3">
+            <div className="p-6 space-y-4">
               {/* Header */}
-              <h2 className="card-title flex items-center gap-2 text-lg font-bold">
-                <Cpu className="w-5 h-5 text-primary" /> {model.name}
-              </h2>
-              <p className="text-sm text-gray-600 line-clamp-2">
-                {model.description || "No description available"}
-              </p>
-
-              {/* Quick Info */}
-              <div className="space-y-2 text-sm">
-                <p className="flex items-center gap-1">
-                  <Cpu className="w-4 h-4 text-gray-500" />
-                  <span className="font-medium text-gray-700">MCU:</span>{" "}
-                  {model.microControllerType}
-                </p>
-                <p className="flex items-center gap-1">
-                  <Plug className="w-4 h-4 text-gray-500" />
-                  <span className="font-medium text-gray-700">Ports:</span>{" "}
-                  {model.ports.length}
-                </p>
-                <p className="flex items-center gap-1 text-gray-500 text-xs">
-                  <Clock className="w-3 h-3" /> Updated:{" "}
-                  {new Date(model.updatedAt).toLocaleDateString()}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Cpu className="w-5 h-5 text-primary flex-shrink-0" />
+                  <Link
+                    href={`/dashboard/device-models/${model._id}`}
+                    className="text-lg font-bold text-primary link link-hover"
+                  >
+                    {model.name}
+                  </Link>
+                </div>
+                <p className="text-sm text-base-content/60 line-clamp-2 leading-relaxed">
+                  {model.description || "No description available"}
                 </p>
               </div>
 
-              {/* Actions */}
-              <div className="card-actions justify-end mt-2 gap-2">
-                <a
-                  onClick={(e) => handleViewClick(e, model._id)}
-                  href={`/dashboard/device-models/${model._id}`}
-                  className="btn btn-xs btn-outline flex items-center gap-1"
-                >
-                  <Eye className="w-3 h-3" /> View
-                </a>
+              {/* Quick Info */}
+              <div className="space-y-2.5 text-sm pt-2 border-t border-base-300">
+                <p className="flex items-center gap-2 text-base-content/80">
+                  <Cpu className="w-4 h-4 text-primary flex-shrink-0" />
+                  <span className="font-medium">MCU:</span>
+                  <span>{model.microControllerType}</span>
+                </p>
+                <p className="flex items-center gap-2 text-base-content/80">
+                  <Plug className="w-4 h-4 text-primary flex-shrink-0" />
+                  <span className="font-medium">Ports:</span>
+                  <span>{model.ports.length}</span>
+                </p>
+                <p className="flex items-center gap-2 text-base-content/50 text-xs">
+                  <Clock className="w-3 h-3 flex-shrink-0" />
+                  <span>
+                    Updated: {new Date(model.updatedAt).toLocaleDateString()}
+                  </span>
+                </p>
               </div>
             </div>
           </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { SectionWrapper } from "@/app/_components/SectionWrapper/SectionWrapper";
+import Button from "@/app/_components/Button/Button";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -15,6 +16,7 @@ import {
 } from "@/app/_lib/_react-query-hooks/portTypes/portTypes.types";
 import { useCreatePortTypeMutation } from "@/app/_lib/_react-query-hooks/portTypes/addPortType";
 import { useUpdatePortTypeMutation } from "@/app/_lib/_react-query-hooks/portTypes/updatePortType";
+import { FormGroup, ActionsBar } from "@/app/_components/layout/LayoutHelpers";
 
 type FormDataType = Pick<
   IPortType,
@@ -80,70 +82,72 @@ export function AddPortType({
 
   return (
     <SectionWrapper>
-      <div className="card bg-base-100 shadow-md border border-base-200 p-6">
-        <h2 className="text-lg font-bold mb-4">
-          {editingId ? "Edit Port Type" : "Add New Port Type"}
-        </h2>
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-xl font-bold text-base-content">
+            {editingId ? "Edit Port Type" : "Add New Port Type"}
+          </h2>
+        </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Name */}
-          <FormField label="Name" error={errors.name?.message}>
-            <TextInput
-              {...register("name", { required: "Name is required" })}
-              placeholder="Enter port type name"
-            />
-          </FormField>
-
-          {/* Category + ValueFormat */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField label="Category" error={errors.category?.message}>
-              <Select
-                {...register("category", {
-                  required: "Category is required",
-                })}
-                options={categoryOptions}
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-0">
+          <FormGroup>
+            {/* Name */}
+            <FormField label="Name" error={errors.name?.message} required>
+              <TextInput
+                {...register("name", { required: "Name is required" })}
+                placeholder="e.g., Temperature Sensor"
               />
             </FormField>
 
-            <FormField label="Value Format" error={errors.valueFormat?.message}>
-              <Select
-                {...register("valueFormat", {
-                  required: "Value format is required",
-                })}
-                options={valueFormatOptions}
+            {/* Category + ValueFormat */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                label="Category"
+                error={errors.category?.message}
+                required
+              >
+                <Select
+                  {...register("category", {
+                    required: "Category is required",
+                  })}
+                  options={categoryOptions}
+                />
+              </FormField>
+
+              <FormField
+                label="Value Format"
+                error={errors.valueFormat?.message}
+                required
+              >
+                <Select
+                  {...register("valueFormat", {
+                    required: "Value format is required",
+                  })}
+                  options={valueFormatOptions}
+                />
+              </FormField>
+            </div>
+
+            {/* Description */}
+            <FormField label="Description">
+              <TextArea
+                {...register("description")}
+                placeholder="Enter description (optional)"
               />
             </FormField>
-          </div>
-
-          {/* Description */}
-          <FormField label="Description">
-            <TextArea
-              {...register("description", {
-                required: "Value format is required",
-              })}
-              placeholder="Enter description (optional)"
-            />
-          </FormField>
+          </FormGroup>
 
           {/* Actions */}
-          <div className="flex justify-end gap-2">
+          <ActionsBar>
             {editingId && (
-              <button
-                type="button"
-                className="btn btn-outline"
-                onClick={handleCancel}
-              >
+              <Button variant="outline" type="button" onClick={handleCancel}>
                 Cancel
-              </button>
+              </Button>
             )}
-            <button
-              disabled={!isValid}
-              type="submit"
-              className="btn btn-primary"
-            >
-              {editingId ? "Update" : "Add"}
-            </button>
-          </div>
+            <Button disabled={!isValid} type="submit" variant="primary">
+              {editingId ? "Update Port Type" : "Add Port Type"}
+            </Button>
+          </ActionsBar>
         </form>
       </div>
     </SectionWrapper>

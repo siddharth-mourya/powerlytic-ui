@@ -1,3 +1,9 @@
 export function PageContentHeader({ title }: { title: string }) {
-  return <h2 className="text-2xl mb-2 font-bold">{title}</h2>;
+  return (
+    <div className="mb-6 pb-4 border-b border-base-300">
+      <h1 className="text-3xl font-bold text-base-content tracking-tight">
+        {title}
+      </h1>
+    </div>
+  );
 }

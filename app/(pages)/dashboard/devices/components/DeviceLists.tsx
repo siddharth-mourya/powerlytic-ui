@@ -4,6 +4,7 @@ import {
   GenericTable,
   TableColumn,
 } from "@/app/_components/GenericTable/GenericTable";
+import Button from "@/app/_components/Button/Button";
 import { IDevice } from "@/app/_lib/_react-query-hooks/device/devices.types";
 import { useDevicesListRQ } from "@/app/_lib/_react-query-hooks/device/useDevicesRQ";
 import axios from "axios";
@@ -58,14 +59,20 @@ export default function DeviceListPage() {
       cell: ({ row }) => {
         const status = row.original.status;
         const colors: Record<string, string> = {
-          online: "badge badge-primary",
-          offline: "badge badge-error",
-          maintenance: "badge badge-outline",
+          online: "bg-success/10 text-success",
+          offline: "bg-error/10 text-error",
+          maintenance: "bg-warning/10 text-warning",
         };
         return status ? (
-          <span className={colors[status]}>{status}</span>
+          <span
+            className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${
+              colors[status] || "bg-base-300 text-base-content"
+            }`}
+          >
+            {status.charAt(0).toUpperCase() + status.slice(1)}
+          </span>
         ) : (
-          "Not Available"
+          <span className="text-base-content/50">Not Available</span>
         );
       },
     },
@@ -81,28 +88,30 @@ export default function DeviceListPage() {
       header: "Actions",
       cell: ({ row }) => (
         <div className="flex gap-2">
-          <button
-            className="btn btn-sm btn-outline"
+          <Button
+            variant="outline"
+            size="sm"
+            leftIcon={<EyeIcon className="w-4 h-4" />}
             onClick={() =>
               router.push(`/dashboard/devices/${row.original._id}`)
             }
           >
-            View <EyeIcon className="w-3 h-3" />
-          </button>
-          <button
-            className="btn btn-sm btn-primary"
+            View
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            leftIcon={<PencilIcon className="w-4 h-4" />}
             onClick={() =>
               router.push(`/dashboard/devices/${row.original._id}/edit`)
             }
-          >
-            <PencilIcon className="w-3 h-3" />
-          </button>
-          <button
-            className="btn btn-sm btn-error"
+          />
+          <Button
+            variant="ghost"
+            size="sm"
+            leftIcon={<Trash2Icon className="w-4 h-4 text-error" />}
             onClick={() => handleDelete(row.original)}
-          >
-            <Trash2Icon className="w-3 h-3" />
-          </button>
+          />
         </div>
       ),
     },

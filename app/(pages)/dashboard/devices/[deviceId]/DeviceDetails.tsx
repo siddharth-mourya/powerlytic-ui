@@ -82,13 +82,18 @@ export function DeviceDetails({ deviceId }: DeviceDetailsPageProps) {
         {/* Header */}
         <div className="flex justify-between items-start mb-6 flex-wrap gap-2">
           <div>
-            <h1 className="text-xl font-semibold">{device.name}</h1>
+            <h1 className="text-xl font-semibold">
+              {device.name}{" "}
+              <Badge variant={device.status === "online" ? "success" : "error"}>
+                {device.status || "offline"}
+              </Badge>
+            </h1>
             <p className="text-sm text-gray-500 flex items-center gap-2">
               <Smartphone size={14} />
               IMEI: {device.imei}
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <button
               className="btn btn-sm btn-outline"
               onClick={() =>
@@ -119,9 +124,6 @@ export function DeviceDetails({ deviceId }: DeviceDetailsPageProps) {
             >
               <PencilIcon className="w-3 h-3" />
             </button>
-            <Badge variant={device.status === "online" ? "success" : "error"}>
-              {device.status || "offline"}
-            </Badge>
           </div>
         </div>
 

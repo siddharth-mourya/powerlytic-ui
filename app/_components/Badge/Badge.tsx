@@ -10,12 +10,12 @@ type BadgeVariant =
   | "neutral";
 
 const variantClasses: Record<BadgeVariant, string> = {
-  default: "bg-gray-200 text-gray-700",
-  success: "bg-green-100 text-green-700",
-  warning: "bg-yellow-100 text-yellow-800",
-  error: "bg-red-100 text-red-700",
-  info: "bg-blue-100 text-blue-700",
-  neutral: "bg-base-400 text-base-content",
+  default: "bg-base-300 text-base-content",
+  success: "bg-success/15 text-success",
+  warning: "bg-warning/15 text-warning",
+  error: "bg-error/15 text-error",
+  info: "bg-info/15 text-info",
+  neutral: "bg-base-300 text-base-content",
 };
 
 export const Badge = ({
@@ -30,9 +30,9 @@ export const Badge = ({
   return (
     <span
       className={classNames(
-        "px-3 py-1 text-xs font-medium rounded-full inline-flex items-center justify-center",
+        "inline-flex items-center px-3 py-1.5 text-xs font-semibold rounded-full whitespace-nowrap transition-colors",
         variantClasses[variant],
-        className
+        className,
       )}
     >
       {children}

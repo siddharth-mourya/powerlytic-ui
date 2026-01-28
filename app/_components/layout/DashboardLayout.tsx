@@ -1,26 +1,28 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import Header from "./Header";
 import Sidebar from "./SideBar";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
+  const [collapsed, setCollapsed] = useState(true);
+
+  const toggleSidebar = () => {
+    setCollapsed((v) => !v);
+  };
+
   return (
-    <div className="drawer sm:drawer-open h-screen w-full overflow-hidden bg-base-100">
-      <input id="dashboard-drawer" type="checkbox" className="drawer-toggle" />
-
-      {/* Main content */}
-      <div className="drawer-content flex flex-col w-full overflow-x-hidden">
-        <Header />
-        <div className="flex-1 w-full overflow-y-auto p-3 sm:p-6 bg-base-100">
-          {children}
-        </div>
-      </div>
-
+    <div className="flex h-screen bg-base-100">
       {/* Sidebar */}
-      <div className="drawer-side z-30">
-        <label htmlFor="dashboard-drawer" className="drawer-overlay"></label>
-        <Sidebar />
+      <Sidebar collapsed={collapsed} onToggleSidebar={toggleSidebar} />
+
+      {/* Main */}
+      <div className="flex flex-1 flex-col overflow-hidden">
+        <Header collapsed={collapsed} onToggleSidebar={toggleSidebar} />
+
+        <main className="flex-1 overflow-y-auto p-4 bg-base-100">
+          {children}
+        </main>
       </div>
     </div>
   );

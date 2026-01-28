@@ -1,3 +1,7 @@
+export interface IBreadcrumb {
+  route: string;
+  items: { label: string; path: string }[];
+}
 export const BREADCRUMBS = {
   dashboard: {
     route: "/dashboard",
@@ -79,7 +83,7 @@ export const BREADCRUMBS = {
     items: [
       { label: "Dashboard", path: "/dashboard" },
       { label: "Devices", path: "/dashboard/devices" },
-      { label: "Device Details", path: "" },
+      { label: "Device Details", path: "/dashboard/devices/{{deviceId}}" },
       { label: "Values", path: "" },
     ],
   },
