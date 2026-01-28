@@ -22,7 +22,7 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 api.interceptors.response.use(
@@ -30,13 +30,21 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    // Redirect to login if any api returns in 401 and skip for auth/me api as it already redirect to login from Authenitcator and it would trigger a infite loop
-    if (
-      error.response?.status === 401 &&
-      !(error.request.responseUrl as string).includes("/api/auth/me")
-    ) {
-      redirectToLogin();
+    // Handle 401 Unauthorized - redirect to logout/login
+    const status = error.response?.status;
+    const url = error.config?.url || error.response?.config?.url || "";
+
+    // Skip for /api/auth/me to avoid infinite loops (Authenticator already handles it)
+    const isAuthMeEndpoint =
+      url.includes("/api/auth/me") || url.includes("/auth/me");
+
+    if (status === 401 && !isAuthMeEndpoint) {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        window.location.href = "/login";
+      }
     }
     return Promise.reject(error);
-  }
+  },
 );

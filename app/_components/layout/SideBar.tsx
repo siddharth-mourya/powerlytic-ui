@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import clsx from "clsx";
-import { LogOut, PanelRightClose, Zap } from "lucide-react";
+import { LogOut, PanelRightOpen, Zap } from "lucide-react";
 import { usePathname } from "next/navigation";
 import ToggleSideBarButton from "./ToggleSidebarButton";
 
@@ -53,7 +53,7 @@ export default function Sidebar({
           <ToggleSideBarButton
             showButton={!collapsed}
             onToggleSidebar={onToggleSidebar}
-            Icon={PanelRightClose}
+            Icon={PanelRightOpen}
           />
         </div>
 

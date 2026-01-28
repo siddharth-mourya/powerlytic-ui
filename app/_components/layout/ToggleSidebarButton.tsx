@@ -1,11 +1,11 @@
 "use client";
 
-import { PanelRightOpen } from "lucide-react";
+import { PanelRightClose } from "lucide-react";
 
 export default function ToggleSideBarButton({
   showButton,
   onToggleSidebar,
-  Icon = PanelRightOpen,
+  Icon = PanelRightClose,
 }: {
   showButton: boolean;
   onToggleSidebar: () => void;

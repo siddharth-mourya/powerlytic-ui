@@ -84,7 +84,7 @@ export function AddPortType({
     <SectionWrapper>
       <div className="space-y-6">
         <div>
-          <h2 className="text-xl font-bold text-base-content">
+          <h2 className="text-lg font-bold text-base-content">
             {editingId ? "Edit Port Type" : "Add New Port Type"}
           </h2>
         </div>
