@@ -8,7 +8,7 @@ import DeviceModelDetailsSkeleton from "./DeviceModelDetailsSkeleton";
 export default function DeviceModelDetails() {
   const { id } = useParams();
   const { data: deviceModel, isLoading } = useDeviceModelDetailsRQ(
-    (id as string) || ""
+    (id as string) || "",
   );
 
   if (isLoading) {
@@ -59,7 +59,7 @@ export default function DeviceModelDetails() {
             <tbody>
               {deviceModel?.ports.map((port) => (
                 <tr key={port._id}>
-                  <td>{port.portNumber}</td>
+                  <td>{port.portKey}</td>
                   <td>{port.portType?.name}</td>
                   <td>{port.microControllerPin}</td>
                   <td>{port.description || "-"}</td>

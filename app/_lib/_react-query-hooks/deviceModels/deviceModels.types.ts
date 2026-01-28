@@ -5,7 +5,7 @@ export interface DeviceModel {
   microControllerType: string;
   ports: {
     _id: string;
-    portNumber: string;
+    portKey: string;
     portType?: {
       _id: string;
       name: string;
