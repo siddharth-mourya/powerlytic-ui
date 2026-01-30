@@ -24,7 +24,7 @@ export interface IValuesQueryParams {
 // GET /api/devices/:deviceId
 export const useValuesListRQ = (
   deviceId: string,
-  params?: IValuesQueryParams
+  params?: IValuesQueryParams,
 ) => {
   const getValues = async () => {
     const res = await api.get(`/values/devices/${deviceId}`, { params });
@@ -63,7 +63,7 @@ export const useValuesLatestRQ = (deviceId: string) => {
 export const useValuesPortSpecificRQ = (
   deviceId: string,
   portKey: string,
-  params?: IValuesQueryParams
+  params?: IValuesQueryParams,
 ) => {
   const getPortValues = async () => {
     const res = await api.get(`/values/devices/${deviceId}/port/${portKey}`, {
@@ -86,7 +86,7 @@ export const useValuesPortSpecificRQ = (
 export const useValuesModbusReadRQ = (
   deviceId: string,
   readId: string,
-  params?: IValuesQueryParams
+  params?: IValuesQueryParams,
 ) => {
   const getModbusValues = async () => {
     const res = await api.get(`/values/devices/${deviceId}/modbus/${readId}`, {
@@ -110,7 +110,7 @@ export const useValuesPortStatsRQ = (
   deviceId: string,
   portKey: string,
   startTime: string,
-  endTime: string
+  endTime: string,
 ) => {
   const getPortStats = async () => {
     const res = await api.get(`/values/devices/${deviceId}/stats/${portKey}`, {
@@ -132,7 +132,7 @@ export const useValuesPortStatsRQ = (
 // GET /api/devices/:deviceId/table
 export const useValuesTableRQ = (
   deviceId: string,
-  params?: IValuesQueryParams
+  params?: IValuesQueryParams,
 ) => {
   const getTableValues = async () => {
     const res = await api.get(`/values/devices/${deviceId}/table`, {
@@ -173,12 +173,12 @@ export const useValuesSnapshotRQ = (deviceId: string) => {
 export const useValuesTimeseriesRQ = (
   deviceId: string,
   portKey: string,
-  params?: IValuesQueryParams
+  params?: IValuesQueryParams,
 ) => {
   const getTimeseries = async () => {
     const res = await api.get(
       `/values/devices/${deviceId}/timeseries/${portKey}`,
-      { params }
+      { params },
     );
     if (res.status !== 200) throw new Error("Failed to fetch timeseries");
     return res.data as IValuesTimeSeriesResponse;
@@ -197,12 +197,12 @@ export const useValuesTimeseriesRQ = (
 export const useValuesModbusTimeseriesRQ = (
   deviceId: string,
   readId: string,
-  params?: IValuesQueryParams
+  params?: IValuesQueryParams,
 ) => {
   const getModbusTimeseries = async () => {
     const res = await api.get(
       `/values/devices/${deviceId}/timeseries/modbus/${readId}`,
-      { params }
+      { params },
     );
     if (res.status !== 200)
       throw new Error("Failed to fetch modbus timeseries");

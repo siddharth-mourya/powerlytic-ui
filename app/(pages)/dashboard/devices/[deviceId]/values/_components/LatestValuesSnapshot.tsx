@@ -271,12 +271,6 @@ export default function LatestValuesSnapshot({
                     >
                       {isOn ? "ON" : "OFF"}
                     </span>
-                    <Badge
-                      variant={getQualityColor(p.quality)}
-                      className="text-xs"
-                    >
-                      {getQualityIcon(p.quality)}
-                    </Badge>
                   </div>
                 </div>
               );
@@ -312,16 +306,8 @@ export default function LatestValuesSnapshot({
                   </p>
                   <div className="flex items-center justify-between">
                     {p.unit && (
-                      <p className="text-xs text-gray-500 truncate">
-                        {p.unit}
-                      </p>
+                      <p className="text-xs text-gray-500 truncate">{p.unit}</p>
                     )}
-                    <Badge
-                      variant={getQualityColor(p.quality)}
-                      className="text-xs ml-auto"
-                    >
-                      {getQualityIcon(p.quality)}
-                    </Badge>
                   </div>
                 </div>
               );
@@ -330,58 +316,87 @@ export default function LatestValuesSnapshot({
         </div>
       )}
 
-      {/* Modbus Inputs - Grouped by Port */}
+      {/* Modbus Inputs - Compact Table View Grouped by Port & Slave */}
       {modbusPorts.length > 0 && (
         <div>
-          <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
+          <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
             🔧 <span>Modbus</span>
           </h4>
-          {modbusPorts.map((modbusPort) => {
-            const mbPort = modbusPort as ILatestModbusPort;
-            return (
-              <div key={mbPort.portKey} className="mb-4">
-                {mbPort.reads.map((read) => (
-                  <div
-                    key={read.readId}
-                    className="p-3 border border-amber-200 rounded-lg bg-amber-50 hover:shadow-sm transition-shadow mb-2 last:mb-0"
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium text-gray-700">
-                          {read.name || read.tag}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          Slave {read.slaveId}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-1 flex-shrink-0">
-                        <Badge
-                          variant={getQualityColor(read.quality)}
-                          className="text-xs"
-                        >
-                          {getQualityIcon(read.quality)}
-                        </Badge>
-                        <ModbusReadDetailsTooltip
-                          read={read}
-                          slaveName={read.slaveId}
-                        />
-                      </div>
-                    </div>
-                    <div className="pt-2 border-t border-amber-200">
-                      <p className="text-sm font-bold text-gray-900">
-                        {typeof read.calibratedValue === "number"
-                          ? read.calibratedValue.toFixed(2)
-                          : read.calibratedValue ?? "-"}
-                      </p>
-                      {read.unit && (
-                        <p className="text-xs text-gray-600">{read.unit}</p>
-                      )}
-                    </div>
+          <div className="space-y-3">
+            {modbusPorts.map((modbusPort) => {
+              const mbPort = modbusPort as ILatestModbusPort;
+              
+              // Group reads by slaveId
+              const readsBySlaveId = mbPort.reads.reduce(
+                (acc, read) => {
+                  const slaveId = read.slaveId;
+                  if (!acc[slaveId]) {
+                    acc[slaveId] = [];
+                  }
+                  acc[slaveId].push(read);
+                  return acc;
+                },
+                {} as Record<string, IModbusRead[]>
+              );
+
+              return (
+                <div key={mbPort.portKey} className="border rounded-lg overflow-hidden bg-white shadow-xs">
+                  {/* Port Header */}
+                  <div className="bg-amber-100 px-3 py-2 border-b border-amber-200">
+                    <p className="text-xs font-semibold text-amber-900">
+                      Port: {mbPort.portKey}
+                    </p>
                   </div>
-                ))}
-              </div>
-            );
-          })}
+
+                  {/* Slaves and Reads */}
+                  <div className="divide-y divide-gray-100">
+                    {Object.entries(readsBySlaveId).map(([slaveId, reads]) => (
+                      <div key={slaveId} className="px-3 py-2">
+                        {/* Slave Header */}
+                        <p className="text-xs font-medium text-gray-600 mb-1.5">
+                          Slave <span className="font-bold text-gray-900">{slaveId}</span>
+                        </p>
+
+                        {/* Reads Table */}
+                        <div className="space-y-1">
+                          {reads.map((read) => (
+                            <div
+                              key={read.readId}
+                              className="flex items-center justify-between gap-2 p-1.5 bg-gray-50 hover:bg-gray-100 rounded transition-colors group"
+                            >
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs font-medium text-gray-700 truncate">
+                                  {read.name || read.tag}
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-2 flex-shrink-0">
+                                <div className="text-right">
+                                  <p className="text-sm font-bold text-gray-900">
+                                    {typeof read.calibratedValue === "number"
+                                      ? read.calibratedValue.toFixed(2)
+                                      : (read.calibratedValue ?? "-")}
+                                  </p>
+                                  {read.unit && (
+                                    <p className="text-xs text-gray-500">
+                                      {read.unit}
+                                    </p>
+                                  )}
+                                </div>
+                                <ModbusReadDetailsTooltip
+                                  read={read}
+                                  slaveName={slaveId}
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
 
