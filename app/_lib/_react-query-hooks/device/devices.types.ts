@@ -5,6 +5,10 @@
  */
 
 // 🔹 Calibration Interface
+
+export type Endianness = "ABCD" | "CDAB" | "BADC" | "DCBA" | "NONE";
+
+export type DeviceStatus = "online" | "offline" | "maintenance";
 export interface ICalibration {
   scaling: number;
   offset: number;
@@ -37,7 +41,7 @@ export interface IModbusRead {
   unit?: string;
   tag?: string;
   dataType?: string;
-  endianness?: "ABCD " | "CDAB " | "BADC " | "DCBA" | "NONE";
+  endianness?: Endianness;
 }
 
 // 🔹 Serial Configuration Interface
@@ -92,7 +96,7 @@ export interface IDevice {
   imei: string;
   deviceModelId: { _id: string; name: string }; // populated
   organizationId?: { _id: string; name: string }; // populated optional
-  status: "online" | "offline" | "maintenance";
+  status: DeviceStatus;
   location?: ILocation;
   metadata?: Record<string, string | number | boolean | null>;
   ports: IPort[];
@@ -120,7 +124,7 @@ export interface IDeviceUpdateInput {
   configId?: string;
   name?: string;
   organizationId?: string;
-  status?: "online" | "offline" | "maintenance";
+  status?: DeviceStatus;
   location?: ILocation;
   metadata?: Record<string, string | number | boolean | null>;
   ports?: IPort[];
@@ -183,4 +187,49 @@ export const BITS_TO_READ_OPTIONS = [
   { label: "16", value: "16" },
   { label: "32", value: "32" },
   { label: "64", value: "64" },
+];
+
+export const PORT_STATUS_OPTIONS = [
+  { label: "ACTIVE", value: "ACTIVE" },
+  { label: "INACTIVE", value: "INACTIVE" },
+];
+
+export const BAUD_RATE_OPTIONS = [
+  { label: "2400", value: 2400 },
+  { label: "4800", value: 4800 },
+  { label: "9600", value: 9600 },
+  { label: "19200", value: 19200 },
+  { label: "38400", value: 38400 },
+  { label: "57600", value: 57600 },
+  { label: "115200", value: 115200 },
+];
+
+export const DATA_BITS_OPTIONS = [
+  { label: "7", value: 7 },
+  { label: "8", value: 8 },
+];
+
+export const STOP_BITS_OPTIONS = [
+  { label: "1", value: 1 },
+  { label: "2", value: 2 },
+];
+
+export const PARITY_OPTIONS = [
+  { label: "None", value: "none" },
+  { label: "Even", value: "even" },
+  { label: "Odd", value: "odd" },
+];
+
+export const ENDIANNESS_OPTION = [
+  { label: "ABCD", value: "ABCD" as const },
+  { label: "CDAB", value: "CDAB" as const },
+  { label: "BADC", value: "BADC" as const },
+  { label: "DCBA", value: "DCBA" as const },
+  { label: "NONE", value: "NONE" as const },
+];
+
+export const DEVICE_STATUS_OPTIONS = [
+  { label: "Online", value: "online" },
+  { label: "Offline", value: "offline" },
+  { label: "Maintenance", value: "maintenance" },
 ];

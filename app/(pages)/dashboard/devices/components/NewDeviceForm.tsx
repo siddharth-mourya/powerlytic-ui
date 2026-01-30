@@ -4,25 +4,39 @@ import { SectionWrapper } from "@/app/_components/SectionWrapper/SectionWrapper"
 import Button from "@/app/_components/Button/Button";
 import { TextInput } from "@/app/_components/Inputs/TextInput";
 import { Select } from "@/app/_components/Inputs/Select";
-import { useCreateDeviceMutation } from "@/app/_lib/_react-query-hooks/device/useDevicesRQ";
+import {
+  CreateDeviceDTO,
+  useCreateDeviceMutation,
+} from "@/app/_lib/_react-query-hooks/device/useDevicesRQ";
 import { useDeviceModelsListRQ } from "@/app/_lib/_react-query-hooks/deviceModels/useDeviceModelsList";
 import { RoleProtectedGuard } from "@/app/_lib/utils/rbac/RoleProtectedGuard";
 import { Actions, Resources } from "@/app/_lib/utils/rbac/resources";
 import { Plus } from "lucide-react";
-import { useState } from "react";
+import { useForm } from "react-hook-form";
 
 export default function NewDeviceForm() {
-  const [name, setName] = useState("");
-  const [imei, setImei] = useState("");
-  const [deviceModelId, setDeviceModelId] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<CreateDeviceDTO>({
+    mode: "onSubmit",
+    shouldFocusError: true,
+    defaultValues: {
+      name: "",
+      imei: "",
+      deviceModelId: "",
+    },
+  });
 
   const { data: models } = useDeviceModelsListRQ();
   const { mutate: createNewDevice, isPending: isLoading } =
     useCreateDeviceMutation();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    createNewDevice({ name, imei, deviceModelId });
+  const onSubmit = async (data: CreateDeviceDTO) => {
+    createNewDevice(data);
+    reset();
   };
 
   const modelOptions =
@@ -34,27 +48,37 @@ export default function NewDeviceForm() {
   return (
     <RoleProtectedGuard resource={Resources.DEVICES} action={Actions.CREATE}>
       <SectionWrapper>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="space-y-4"
+          noValidate
+        >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <TextInput
               label="Device Name"
               placeholder="e.g., Device-001"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              error={errors.name?.message}
+              {...register("name", {
+                required: "Device name is required",
+              })}
               required
             />
             <TextInput
               label="IMEI"
               placeholder="Enter IMEI"
-              value={imei}
-              onChange={(e) => setImei(e.target.value)}
+              error={errors.imei?.message}
+              {...register("imei", {
+                required: "IMEI is required",
+              })}
               required
             />
             <Select
               label="Device Model"
               options={modelOptions}
-              value={deviceModelId}
-              onChange={(e) => setDeviceModelId(e.target.value)}
+              error={errors.deviceModelId?.message}
+              {...register("deviceModelId", {
+                required: "Device Model is required",
+              })}
               required
             />
           </div>

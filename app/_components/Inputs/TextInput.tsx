@@ -10,7 +10,7 @@ type TextInputProps = InputHTMLAttributes<HTMLInputElement> & {
 export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
   ({ label, error, description, required = false, ...props }, ref) => {
     return (
-      <div className="w-full">
+      <div className={`w-full ${props.className || ""}`}>
         {label && (
           <label className="block text-sm font-semibold text-base-content mb-2">
             {label}

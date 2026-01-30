@@ -1,6 +1,6 @@
 import { SelectHTMLAttributes } from "react";
 
-type Option = { value: string; label: string };
+type Option = { value: string | number; label: string };
 
 type SelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
   options: Option[];

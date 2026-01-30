@@ -5,8 +5,13 @@ import { FormField } from "@/app/_components/Inputs/FormField";
 import { Select } from "@/app/_components/Inputs/Select";
 import { TextInput } from "@/app/_components/Inputs/TextInput";
 import {
+  BAUD_RATE_OPTIONS,
+  DATA_BITS_OPTIONS,
+  ENDIANNESS_OPTION,
   FUNCTION_CODE_OPTIONS,
   IDevice,
+  PARITY_OPTIONS,
+  STOP_BITS_OPTIONS,
 } from "@/app/_lib/_react-query-hooks/device/devices.types";
 import { Trash2 } from "lucide-react";
 import {
@@ -14,6 +19,7 @@ import {
   useFieldArray,
   UseFormRegister,
   useWatch,
+  FieldErrors,
 } from "react-hook-form";
 
 // Determine available bit options based on function code
@@ -37,6 +43,7 @@ interface ReadCardProps {
   readIndex: number;
   control: Control<IDevice>;
   register: UseFormRegister<IDevice>;
+  errors?: FieldErrors<IDevice>;
   onRemove: () => void;
 }
 
@@ -46,6 +53,7 @@ function ReadCard({
   readIndex,
   control,
   register,
+  errors,
   onRemove,
 }: ReadCardProps) {
   const fieldPath = ``;
@@ -69,61 +77,131 @@ function ReadCard({
       <CardContent className="grid md:grid-cols-3 gap-3">
         <TextInput
           label="Start Address"
+          error={
+            errors?.ports?.[portIndex]?.modbusSlaves?.[slaveIndex]?.reads?.[
+              readIndex
+            ]?.startAddress?.message
+          }
           {...register(
             `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.startAddress`,
+
+            {
+              required: "Start Address is required",
+            },
           )}
+          required
         />
         <TextInput
           label="Name"
+          required
+          error={
+            errors?.ports?.[portIndex]?.modbusSlaves?.[slaveIndex]?.reads?.[
+              readIndex
+            ]?.name?.message
+          }
           {...register(
             `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.name`,
+            {
+              required: "Name is required",
+            },
           )}
         />
         <TextInput
           label="Unit"
+          required
+          error={
+            errors?.ports?.[portIndex]?.modbusSlaves?.[slaveIndex]?.reads?.[
+              readIndex
+            ]?.unit?.message
+          }
           {...register(
             `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.unit`,
+            {
+              required: "Unit is required",
+            },
           )}
         />
         <TextInput
           label="Scaling"
           type="number"
+          required
+          error={
+            errors?.ports?.[portIndex]?.modbusSlaves?.[slaveIndex]?.reads?.[
+              readIndex
+            ]?.scaling?.message
+          }
           {...register(
             `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.scaling`,
+            {
+              required: "Scaling is required",
+              valueAsNumber: true,
+            },
           )}
         />
         <TextInput
           label="Offset"
           type="number"
+          required
+          error={
+            errors?.ports?.[portIndex]?.modbusSlaves?.[slaveIndex]?.reads?.[
+              readIndex
+            ]?.offset?.message
+          }
           {...register(
             `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.offset`,
+            {
+              required: "Offset is required",
+              valueAsNumber: true,
+            },
           )}
         />
-        <TextInput
-          label="Data Type"
-          {...register(
-            `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.dataType`,
-          )}
-        />
-        <TextInput
-          label="Tag"
-          {...register(
-            `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.tag`,
-          )}
-        />
-        <FormField label="Function Code">
-          <Select
-            {...register(
-              `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.functionCode`,
-            )}
-            options={FUNCTION_CODE_OPTIONS}
-          />
-        </FormField>
 
-        <FormField label="Bits to read">
+        <Select
+          label="Endianness"
+          required
+          error={
+            errors?.ports?.[portIndex]?.modbusSlaves?.[slaveIndex]?.reads?.[
+              readIndex
+            ]?.endianness?.message
+          }
+          {...register(
+            `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.endianness`,
+            {
+              required: "Endianness is required",
+            },
+          )}
+          options={ENDIANNESS_OPTION}
+        />
+        <Select
+          label="Function Code"
+          required
+          error={
+            errors?.ports?.[portIndex]?.modbusSlaves?.[slaveIndex]?.reads?.[
+              readIndex
+            ]?.functionCode?.message
+          }
+          {...register(
+            `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.functionCode`,
+            {
+              required: "Function Code is required",
+            },
+          )}
+          options={FUNCTION_CODE_OPTIONS}
+        />
+
+        <FormField label="Data Bits" required>
           <Select
+            required
+            error={
+              errors?.ports?.[portIndex]?.modbusSlaves?.[slaveIndex]?.reads?.[
+                readIndex
+              ]?.bitsToRead?.message
+            }
             {...register(
               `ports.${portIndex}.modbusSlaves.${slaveIndex}.reads.${readIndex}.bitsToRead`,
+              {
+                required: "Data Bits is required",
+              },
             )}
             options={bitsToReadOptions}
           />
@@ -139,11 +217,13 @@ export function SlaveSection({
   control,
   register,
   onRemove,
+  errors,
 }: {
   portIndex: number;
   slaveIndex: number;
   control: Control<IDevice>;
   register: UseFormRegister<IDevice>;
+  errors?: FieldErrors<IDevice>;
   onRemove: () => void;
 }) {
   const { fields, append, remove } = useFieldArray({
@@ -156,41 +236,104 @@ export function SlaveSection({
       <AccordionHeader title={`Slave ${slaveIndex + 1}`} />
 
       <div className="space-y-4 p-4">
-        <TextInput
-          {...register(`ports.${portIndex}.modbusSlaves.${slaveIndex}.slaveId`)}
-          label="Slave Id"
-          type="number"
-        />
+        <div className="grid grid-cols-2 gap-4">
+          <TextInput
+            className="w-fit"
+            required
+            error={
+              errors?.ports?.[portIndex]?.modbusSlaves?.[slaveIndex]?.slaveId
+                ?.message
+            }
+            {...register(
+              `ports.${portIndex}.modbusSlaves.${slaveIndex}.slaveId`,
+              {
+                required: "Slave Id is required",
+                valueAsNumber: true,
+              },
+            )}
+            label="Slave Id"
+            type="number"
+          />
+          <TextInput
+            required
+            error={
+              errors?.ports?.[portIndex]?.modbusSlaves?.[slaveIndex]?.name
+                ?.message
+            }
+            {...register(`ports.${portIndex}.modbusSlaves.${slaveIndex}.name`, {
+              required: "Slave Name is required",
+            })}
+            label="Slave Name"
+            type="text"
+          />
+        </div>
+
         {/* Serial + Polling */}
         <div className="grid grid-cols-2 gap-4">
           <Card>
             <CardTitle>Serial</CardTitle>
             <CardContent className="grid grid-cols-2 gap-2">
-              <TextInput
+              <Select
+                label="BaudRate"
+                required
+                error={
+                  errors?.ports?.[portIndex]?.modbusSlaves?.[slaveIndex]?.serial
+                    ?.baudRate?.message
+                }
                 {...register(
                   `ports.${portIndex}.modbusSlaves.${slaveIndex}.serial.baudRate`,
+                  {
+                    required: "BaudRate format is required",
+                  },
                 )}
-                label="Baud Rate"
-                type="number"
+                options={BAUD_RATE_OPTIONS}
               />
-              <TextInput
+
+              <Select
+                error={
+                  errors?.ports?.[portIndex]?.modbusSlaves?.[slaveIndex]?.serial
+                    ?.dataBits?.message
+                }
+                required
                 {...register(
                   `ports.${portIndex}.modbusSlaves.${slaveIndex}.serial.dataBits`,
+                  {
+                    required: "Data Bits format is required",
+                  },
                 )}
                 label="Data Bits"
-                type="number"
+                options={DATA_BITS_OPTIONS}
               />
-              <TextInput
+
+              <Select
+                error={
+                  errors?.ports?.[portIndex]?.modbusSlaves?.[slaveIndex]?.serial
+                    ?.stopBits?.message
+                }
+                required
                 {...register(
                   `ports.${portIndex}.modbusSlaves.${slaveIndex}.serial.stopBits`,
+                  {
+                    required: "Stop Bits format is required",
+                  },
                 )}
+                options={STOP_BITS_OPTIONS}
                 label="Stop Bits"
-                type="number"
               />
-              <TextInput
+
+              <Select
+                error={
+                  errors?.ports?.[portIndex]?.modbusSlaves?.[slaveIndex]?.serial
+                    ?.parity?.message
+                }
+                required
                 {...register(
                   `ports.${portIndex}.modbusSlaves.${slaveIndex}.serial.parity`,
+                  {
+                    required: "Parity is required",
+                  },
                 )}
+                options={PARITY_OPTIONS}
                 label="Parity"
               />
             </CardContent>
@@ -202,22 +345,49 @@ export function SlaveSection({
               <TextInput
                 label="Interval (ms)"
                 type="number"
+                required
+                error={
+                  errors?.ports?.[portIndex]?.modbusSlaves?.[slaveIndex]
+                    ?.polling?.intervalMs?.message
+                }
                 {...register(
                   `ports.${portIndex}.modbusSlaves.${slaveIndex}.polling.intervalMs`,
+                  {
+                    required: "Interval is required",
+                    valueAsNumber: true,
+                  },
                 )}
               />
               <TextInput
                 label="Timeout (ms)"
                 type="number"
+                required
+                error={
+                  errors?.ports?.[portIndex]?.modbusSlaves?.[slaveIndex]
+                    ?.polling?.timeoutMs?.message
+                }
                 {...register(
                   `ports.${portIndex}.modbusSlaves.${slaveIndex}.polling.timeoutMs`,
+                  {
+                    required: "Timeout is required",
+                    valueAsNumber: true,
+                  },
                 )}
               />
               <TextInput
                 label="Retries"
                 type="number"
+                required
+                error={
+                  errors?.ports?.[portIndex]?.modbusSlaves?.[slaveIndex]
+                    ?.polling?.retries?.message
+                }
                 {...register(
                   `ports.${portIndex}.modbusSlaves.${slaveIndex}.polling.retries`,
+                  {
+                    required: "Retries is required",
+                    valueAsNumber: true,
+                  },
                 )}
               />
             </CardContent>
@@ -234,6 +404,7 @@ export function SlaveSection({
               portIndex={portIndex}
               control={control}
               register={register}
+              errors={errors}
               onRemove={() => remove(readIndex)}
             />
           ))}
@@ -256,6 +427,7 @@ export function SlaveSection({
                 functionCode: "fc_3",
                 startAddress: 0,
                 bitsToRead: 16,
+                endianness: ENDIANNESS_OPTION[0].value,
               })
             }
           >

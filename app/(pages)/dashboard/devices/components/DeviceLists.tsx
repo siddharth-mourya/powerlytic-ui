@@ -6,7 +6,10 @@ import {
 } from "@/app/_components/GenericTable/GenericTable";
 import Button from "@/app/_components/Button/Button";
 import { IDevice } from "@/app/_lib/_react-query-hooks/device/devices.types";
-import { useDevicesListRQ } from "@/app/_lib/_react-query-hooks/device/useDevicesRQ";
+import {
+  useDeleteDeviceMutation,
+  useDevicesListRQ,
+} from "@/app/_lib/_react-query-hooks/device/useDevicesRQ";
 import axios from "axios";
 import { EyeIcon, PencilIcon, Trash2Icon } from "lucide-react";
 import Link from "next/link";
@@ -16,15 +19,13 @@ import { toast } from "react-toastify";
 export default function DeviceListPage() {
   const router = useRouter();
   const { data: devices, refetch: refetchDevices } = useDevicesListRQ();
+  const { mutate: deleteDevice } = useDeleteDeviceMutation();
 
   const handleDelete = async (device: IDevice) => {
     if (!confirm(`Are you sure you want to delete ${device.name}?`)) return;
-    try {
-      await axios.delete(`/api/devices/${device._id}`);
-      toast.success("Device deleted");
+    if (device._id) {
+      await deleteDevice(device._id);
       refetchDevices();
-    } catch {
-      // toast.error(err?.response?.data?.message || err.message);
     }
   };
 

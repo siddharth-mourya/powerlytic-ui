@@ -160,7 +160,7 @@ export const useDeleteDeviceMutation = () => {
   return useMutation({
     mutationFn: async (id: string) => {
       const res = await api.delete(`/device/${id}`);
-      if (res.status !== 200) throw new Error("Failed to delete device");
+      if (res.status !== 204) throw new Error("Failed to delete device");
       return res.data;
     },
     onSuccess: () => {

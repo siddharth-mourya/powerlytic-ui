@@ -79,6 +79,10 @@ export function DeployConfigStatus({
     try {
       await deployConfigMutation();
       // Status will be updated via polling
+      setTimeout(() => {
+        // Stop polling after 60 seconds if no update
+        setIsDeploying(false);
+      }, 30000);
     } catch (error) {
       console.error("Deploy error:", error);
       setStatus(DEPLOY_STATUS.ERROR);

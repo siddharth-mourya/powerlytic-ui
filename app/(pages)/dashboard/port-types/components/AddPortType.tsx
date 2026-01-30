@@ -46,6 +46,7 @@ export function AddPortType({
     formState: { errors, isValid },
   } = useForm<FormDataType>({
     defaultValues,
+    mode: "onSubmit",
   });
 
   const onSubmit = async (data: FormDataType) => {
@@ -144,7 +145,7 @@ export function AddPortType({
                 Cancel
               </Button>
             )}
-            <Button disabled={!isValid} type="submit" variant="primary">
+            <Button type="submit" variant="primary">
               {editingId ? "Update Port Type" : "Add Port Type"}
             </Button>
           </ActionsBar>

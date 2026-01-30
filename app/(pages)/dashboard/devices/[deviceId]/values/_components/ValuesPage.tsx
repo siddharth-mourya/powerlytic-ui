@@ -1,15 +1,14 @@
 "use client";
 
-import { useState } from "react";
 import { PageContentHeader } from "@/app/_components/layout/PageContentHeader";
 import { SectionWrapper } from "@/app/_components/SectionWrapper/SectionWrapper";
-import { Loader2 } from "lucide-react";
 import { useDeviceByIdRQ } from "@/app/_lib/_react-query-hooks/device/useDevicesRQ";
-import { useValuesSnapshotRQ } from "@/app/_lib/_react-query-hooks/values/useValuesRQ";
+import { Loader2 } from "lucide-react";
+import { useState } from "react";
 import LatestValuesSnapshot from "./LatestValuesSnapshot";
+import PortTimeSeriesChart from "./PortTimeSeriesChart";
 import ValuesFilters from "./ValuesFilters";
 import ValuesTableView from "./ValuesTableView";
-import PortTimeSeriesChart from "./PortTimeSeriesChart";
 
 interface ValuesPageProps {
   deviceId: string;
@@ -29,10 +28,6 @@ export default function ValuesPage({ deviceId }: ValuesPageProps) {
   // Fetch device info
   const { data: device, isLoading: deviceLoading } = useDeviceByIdRQ(deviceId);
 
-  // Fetch latest snapshot
-  const { data: snapshot, isLoading: snapshotLoading } =
-    useValuesSnapshotRQ(deviceId);
-
   if (deviceLoading) {
     return (
       <div className="flex items-center justify-center h-48">
@@ -48,6 +43,8 @@ export default function ValuesPage({ deviceId }: ValuesPageProps) {
   // Get available ports from device
   const availablePorts = device.ports || [];
 
+  const disableChart = true;
+
   return (
     <SectionWrapper>
       <PageContentHeader title={`Device Values: ${device.name}`} />
@@ -59,7 +56,7 @@ export default function ValuesPage({ deviceId }: ValuesPageProps) {
       <div className="flex gap-2 mb-6 border-b border-gray-200">
         <button
           onClick={() => setViewMode("snapshot")}
-          className={`px-4 py-2 font-medium border-b-2 transition-colors ${
+          className={`cursor-pointer px-4 py-2 font-medium border-b-2 transition-colors ${
             viewMode === "snapshot"
               ? "border-primary text-primary"
               : "border-transparent text-gray-600 hover:text-gray-900"
@@ -69,7 +66,7 @@ export default function ValuesPage({ deviceId }: ValuesPageProps) {
         </button>
         <button
           onClick={() => setViewMode("table")}
-          className={`px-4 py-2 font-medium border-b-2 transition-colors ${
+          className={`cursor-pointer px-4 py-2 font-medium border-b-2 transition-colors ${
             viewMode === "table"
               ? "border-primary text-primary"
               : "border-transparent text-gray-600 hover:text-gray-900"
@@ -78,11 +75,16 @@ export default function ValuesPage({ deviceId }: ValuesPageProps) {
           📋 Data Table
         </button>
         <button
+          disabled={disableChart}
           onClick={() => setViewMode("charts")}
-          className={`px-4 py-2 font-medium border-b-2 transition-colors ${
+          className={`${
             viewMode === "charts"
               ? "border-primary text-primary"
               : "border-transparent text-gray-600 hover:text-gray-900"
+          } px-4 py-2 font-medium border-b-2 transition-colors ${
+            disableChart
+              ? "text-neutral-content cursor-not-allowed hover:text-neutral-content"
+              : ""
           }`}
         >
           📈 Charts & Trends
@@ -106,11 +108,7 @@ export default function ValuesPage({ deviceId }: ValuesPageProps) {
 
         {/* View: Latest Values Snapshot */}
         {viewMode === "snapshot" && (
-          <LatestValuesSnapshot
-            deviceId={deviceId}
-            device={device}
-            isLoading={snapshotLoading}
-          />
+          <LatestValuesSnapshot deviceId={deviceId} />
         )}
 
         {/* View: Data Table */}

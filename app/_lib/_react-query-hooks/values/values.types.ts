@@ -120,30 +120,82 @@ export interface IModbusReadTimeSeries {
   };
 }
 
-// 🔹 Port Snapshot (Latest Value)
-export interface IPortSnapshot {
-  value: number | boolean | string;
+// 🔹 Calibration Configuration
+export interface ICalibration {
+  scaling: number;
+  offset: number;
+}
+
+// 🔹 Thresholds Configuration
+export interface IThresholds {
+  min: number | null;
+  max: number | null;
+  message: string;
+}
+
+// 🔹 Modbus Read (nested in Modbus Port)
+export interface IModbusRead {
+  portKey: string;
+  readId: string;
+  slaveId: string;
+  name: string;
+  tag?: string;
   unit?: string;
-  timestamp: string;
-  quality?: "good" | "bad" | "uncertain";
+  dataType?: string;
+  startAddress: number;
+  bitsToRead: number;
+  endianness: string;
+  registerType: string;
+  functionCode: string;
+  scaling: number;
+  offset: number;
+  rawValue: number | null;
+  calibratedValue: number | null;
+  parsedValue?: number;
+  rawRegisters?: string[];
+  quality: "good" | "bad" | "uncertain";
+  timestamp: string | null;
+  ingestTimestamp: string | null;
 }
 
-// 🔹 Modbus Read Snapshot
-export interface IModbusReadSnapshot {
-  [readId: string]: IPortSnapshot;
+// 🔹 Latest Port (Digital/Analog)
+export interface ILatestPort {
+  portKey: string;
+  portType: string; // Can be ID or "MODBUS"
+  name: string;
+  unit?: string;
+  status: string;
+  calibration: ICalibration;
+  thresholds: IThresholds;
+  rawValue: number | boolean | null;
+  calibratedValue: number | boolean | null;
+  quality: "good" | "bad" | "uncertain";
+  timestamp: string | null;
+  ingestTimestamp: string | null;
 }
 
-// 🔹 Modbus Slave Snapshot
-export interface IModbusSlaveSnapshot {
-  [slaveId: string]: IModbusReadSnapshot;
+// 🔹 Latest Modbus Port (with reads array)
+export interface ILatestModbusPort extends Omit<ILatestPort, "portType"> {
+  portType: "MODBUS";
+  reads: IModbusRead[];
 }
 
-// 🔹 Latest Values Snapshot (All Ports)
+// 🔹 Latest Port Type (Digital/Analog/Modbus)
+export type ILatestPortType = ILatestPort | ILatestModbusPort;
+
+// 🔹 Device Info in Latest Values Response
+export interface ILatestValueDevice {
+  id: string;
+  name: string;
+  status: string;
+}
+
+// 🔹 Latest Values Snapshot Response
 export interface IValuesSnapshot {
-  timestamp: string;
-  ports: {
-    [portKey: string]: IPortSnapshot | IModbusSlaveSnapshot;
-  };
+  success: boolean;
+  device: ILatestValueDevice;
+  count: number;
+  ports: ILatestPortType[];
 }
 
 // 🔹 Port Statistics
@@ -187,7 +239,9 @@ export interface IModbusReadTimeSeriesResponse {
 // Snapshot response
 export interface IValuesSnapshotResponse {
   success: boolean;
-  data: IValuesSnapshot;
+  device: ILatestValueDevice;
+  count: number;
+  ports: ILatestPortType[];
 }
 
 // Stats response

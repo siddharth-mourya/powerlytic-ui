@@ -46,15 +46,15 @@ export const useValuesLatestRQ = (deviceId: string) => {
   const getLatestValues = async () => {
     const res = await api.get(`/values/devices/${deviceId}/latest`);
     if (res.status !== 200) throw new Error("Failed to fetch latest values");
-    return res.data as IValuesListResponse;
+    return res.data as IValuesSnapshotResponse;
   };
 
   return useQuery({
     queryKey: [queryKeys.values.latest, deviceId],
     queryFn: getLatestValues,
     enabled: !!deviceId,
-    staleTime: 1000 * 3, // 10 seconds
-    refetchInterval: 1000 * 3, // Refetch every 1 seconds
+    staleTime: 1000 * 3, // 3 seconds
+    refetchInterval: 1000 * 3, // Refetch every 3 seconds
   });
 };
 

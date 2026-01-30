@@ -1,20 +1,23 @@
 import { AccordionHeader } from "@/app/_components/Accordion/AccordionHeader";
+import { Select } from "@/app/_components/Inputs/Select";
 import { TextInput } from "@/app/_components/Inputs/TextInput";
 import {
   IDevice,
   IPort,
+  PORT_STATUS_OPTIONS,
 } from "@/app/_lib/_react-query-hooks/device/devices.types";
-import { UseFormRegister } from "react-hook-form";
+import { UseFormRegister, FieldErrors } from "react-hook-form";
 interface PortGroupProps {
   title: string;
   color: string;
   ports?: IPortGroupWithIndex;
   register: UseFormRegister<IDevice>;
+  errors?: FieldErrors<IDevice>;
 }
 
 export type IPortGroupWithIndex = Array<IPort & { originalIndex: number }>;
 
-export function PortGroup({ title, ports, register }: PortGroupProps) {
+export function PortGroup({ title, ports, register, errors }: PortGroupProps) {
   if (!ports?.length) return null;
 
   return (
@@ -38,28 +41,52 @@ export function PortGroup({ title, ports, register }: PortGroupProps) {
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <TextInput label="Unit" {...register(`ports.${i}.unit`)} />
+                <TextInput
+                  label="Name"
+                  required
+                  error={errors?.ports?.[i]?.name?.message}
+                  {...register(`ports.${i}.name`, {
+                    required: "Name is required",
+                  })}
+                />
+                <TextInput
+                  label="Unit"
+                  required
+                  error={errors?.ports?.[i]?.unit?.message}
+                  {...register(`ports.${i}.unit`, {
+                    required: "Unit is required",
+                  })}
+                />
 
-                <div>
-                  <label className="text-xs">Status</label>
-                  <select
-                    {...register(`ports.${i}.status`)}
-                    className="select select-bordered w-full"
-                  >
-                    <option value="ACTIVE">Active</option>
-                    <option value="INACTIVE">Inactive</option>
-                  </select>
-                </div>
+                <Select
+                  label="Value Format"
+                  required
+                  error={errors?.ports?.[i]?.status?.message}
+                  {...register(`ports.${i}.status`, {
+                    required: "Status format is required",
+                  })}
+                  options={PORT_STATUS_OPTIONS}
+                />
 
                 <TextInput
                   label="Scaling"
                   type="number"
-                  {...register(`ports.${i}.calibrationValue.scaling`)}
+                  required
+                  error={errors?.ports?.[i]?.calibrationValue?.scaling?.message}
+                  {...register(`ports.${i}.calibrationValue.scaling`, {
+                    required: "Scaling is required",
+                    valueAsNumber: true,
+                  })}
                 />
                 <TextInput
                   label="Offset"
                   type="number"
-                  {...register(`ports.${i}.calibrationValue.offset`)}
+                  required
+                  error={errors?.ports?.[i]?.calibrationValue?.offset?.message}
+                  {...register(`ports.${i}.calibrationValue.offset`, {
+                    required: "Offset is required",
+                    valueAsNumber: true,
+                  })}
                 />
               </div>
 
@@ -71,16 +98,30 @@ export function PortGroup({ title, ports, register }: PortGroupProps) {
                   <TextInput
                     placeholder="Min"
                     type="number"
-                    {...register(`ports.${i}.thresholds.min`)}
+                    required
+                    error={errors?.ports?.[i]?.thresholds?.min?.message}
+                    {...register(`ports.${i}.thresholds.min`, {
+                      required: "Min threshold is required",
+                      valueAsNumber: true,
+                    })}
                   />
                   <TextInput
                     placeholder="Max"
                     type="number"
-                    {...register(`ports.${i}.thresholds.max`)}
+                    required
+                    error={errors?.ports?.[i]?.thresholds?.max?.message}
+                    {...register(`ports.${i}.thresholds.max`, {
+                      required: "Max threshold is required",
+                      valueAsNumber: true,
+                    })}
                   />
                   <TextInput
                     placeholder="Message"
-                    {...register(`ports.${i}.thresholds.message`)}
+                    required
+                    error={errors?.ports?.[i]?.thresholds?.message?.message}
+                    {...register(`ports.${i}.thresholds.message`, {
+                      required: "Message is required",
+                    })}
                   />
                 </div>
               </div>

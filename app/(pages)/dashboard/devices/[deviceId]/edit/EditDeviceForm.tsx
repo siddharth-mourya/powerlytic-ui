@@ -14,11 +14,13 @@ import { useEffect } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 
 import {
+  DEVICE_STATUS_OPTIONS,
   IDevice,
   IPort,
 } from "@/app/_lib/_react-query-hooks/device/devices.types";
 import { IPortGroupWithIndex, PortGroup } from "./components/PortGroup";
 import { ModbusPortsSection } from "./components/modbus/ModbusPortsSection";
+import { Select } from "@/app/_components/Inputs/Select";
 
 /**
  * Filter and map ports by key prefix, preserving original indices
@@ -44,8 +46,8 @@ export function EditDeviceForm({ deviceId }: { deviceId: string }) {
       alertEmails: [],
       alertPhones: [],
     },
-    shouldFocusError: false,
-    mode: "onChange",
+    shouldFocusError: true,
+    mode: "onSubmit",
   });
   const {
     register,
@@ -80,11 +82,7 @@ export function EditDeviceForm({ deviceId }: { deviceId: string }) {
   }, [device, reset]);
 
   const onSubmit = async (values: IDevice) => {
-    console.log("Submitting", values);
-    if (Object.keys(errors).length > 0) {
-      console.warn("Form has validation errors:", errors);
-      return;
-    }
+    console.log("Form submitted with values:", values);
     await updateDevice.mutate({
       name: values.name,
       status: values.status,
@@ -97,7 +95,6 @@ export function EditDeviceForm({ deviceId }: { deviceId: string }) {
     });
   };
 
-  console.log("Rendering EditDeviceForm", { device, isLoading });
   if (isLoading) return <p>Loading...</p>;
 
   return (
@@ -114,15 +111,35 @@ export function EditDeviceForm({ deviceId }: { deviceId: string }) {
               Editing - {device?.name}
             </CardTitle>
             <CardContent className="p-6 space-y-4">
-              <TextInput label="Device Name" {...register("name")} />
-              <select
-                {...register("status")}
-                className="select select-bordered"
-              >
-                <option value="online">Online</option>
-                <option value="offline">Offline</option>
-                <option value="maintenance">Maintenance</option>
-              </select>
+              <TextInput
+                label="Device Name"
+                required
+                error={errors.name?.message}
+                {...register("name", {
+                  required: "Device name is required",
+                })}
+              />
+              <div className="form-control w-full">
+                <label className="label">
+                  <span className="label-text font-medium">
+                    Status <span className="text-error">*</span>
+                  </span>
+                </label>
+                <Select
+                  required
+                  error={errors.status?.message}
+                  {...register("status", {
+                    required: "Status is required",
+                  })}
+                  options={DEVICE_STATUS_OPTIONS}
+                  className="select select-bordered"
+                />
+                {errors.status && (
+                  <p className="text-xs text-error mt-1.5 font-medium">
+                    {errors.status.message}
+                  </p>
+                )}
+              </div>
             </CardContent>
           </Card>
 
@@ -134,17 +151,20 @@ export function EditDeviceForm({ deviceId }: { deviceId: string }) {
                 color="border-blue-300"
                 ports={filterPortsByPrefix(device?.ports, "DI")}
                 register={register}
+                errors={errors}
               />
               <PortGroup
                 title="Analog Inputs"
                 color="border-green-300"
                 ports={filterPortsByPrefix(device?.ports, "AI")}
                 register={register}
+                errors={errors}
               />
               <ModbusPortsSection
                 control={form.control}
                 ports={filterPortsByPrefix(device?.ports, "MI")}
                 register={register}
+                errors={errors}
               />
             </CardContent>
           </Card>
@@ -156,7 +176,14 @@ export function EditDeviceForm({ deviceId }: { deviceId: string }) {
               {emailFields.map((field, i) => (
                 <div key={field.id} className="flex items-center gap-2">
                   <TextInput
-                    {...register(`alertEmails.${i}`)}
+                    error={errors.alertEmails?.[i]?.message}
+                    {...register(`alertEmails.${i}`, {
+                      required: "Email is required",
+                      pattern: {
+                        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                        message: "Invalid email format",
+                      },
+                    })}
                     placeholder="email@example.com"
                   />
                   <Button
@@ -183,7 +210,14 @@ export function EditDeviceForm({ deviceId }: { deviceId: string }) {
               {phoneFields.map((field, i) => (
                 <div key={field.id} className="flex items-center gap-2">
                   <TextInput
-                    {...register(`alertPhones.${i}`)}
+                    error={errors.alertPhones?.[i]?.message}
+                    {...register(`alertPhones.${i}`, {
+                      required: "Phone number is required",
+                      pattern: {
+                        value: /^[\d\s\-\+\(\)]{10,}$/,
+                        message: "Invalid phone format",
+                      },
+                    })}
                     placeholder="+91 9876543210"
                   />
                   <Button
@@ -206,11 +240,7 @@ export function EditDeviceForm({ deviceId }: { deviceId: string }) {
             </CardContent>
           </Card>
 
-          <Button
-            disabled={!form.formState.isDirty}
-            type="submit"
-            loading={updateDevice.isPending}
-          >
+          <Button type="submit" loading={updateDevice.isPending}>
             Save Changes
           </Button>
         </form>

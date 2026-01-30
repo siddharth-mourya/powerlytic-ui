@@ -1,51 +1,116 @@
 "use client";
 
 import { Badge } from "@/app/_components/Badge/Badge";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/app/_components/Card/Card";
-import { IDevice } from "@/app/_lib/_react-query-hooks/device/devices.types";
 import { useValuesLatestRQ } from "@/app/_lib/_react-query-hooks/values/useValuesRQ";
 import {
-  IValue,
-  IValuesListResponse,
+  ILatestPort,
+  ILatestModbusPort,
+  IModbusRead,
 } from "@/app/_lib/_react-query-hooks/values/values.types";
 import { Loader2, Activity, Info } from "lucide-react";
 import { useMemo, useState } from "react";
 
-interface LatestValuesSnapshotProps {
-  deviceId: string;
-  device: IDevice;
-  isLoading: boolean;
+// Helper function to check if port is Modbus
+function isModbusPort(port: unknown): port is ILatestModbusPort {
+  const p = port as Record<string, unknown>;
+  return (
+    p.portType === "MODBUS" &&
+    Array.isArray(p.reads) &&
+    (p.reads as unknown[]).length > 0
+  );
 }
 
-interface PortSnapshot {
-  portKey: string;
-  name: string;
-  value?: number | boolean | string;
-  unit?: string;
-  quality?: "good" | "bad" | "uncertain";
-  timestamp?: string;
-  type: "DIGITAL" | "ANALOG" | "MODBUS";
-  modbusRead?: {
-    readId: string;
-    slaveId: string;
-    name: string;
-  };
+// Helper function to check if port is Digital
+function isDigitalPort(port: unknown): boolean {
+  const p = port as Record<string, unknown>;
+  return (
+    typeof p.portType === "string" &&
+    p.portType !== "MODBUS" &&
+    p.calibratedValue !== null &&
+    (p.calibratedValue === 0 || p.calibratedValue === 1)
+  );
 }
 
-// Simple tooltip info component
-function ModbusInfoTooltip({
-  slaveId,
-  readId,
-  portKey,
+// Helper function to check if port is Analog
+function isAnalogPort(port: unknown): boolean {
+  const p = port as Record<string, unknown>;
+  return (
+    typeof p.portType === "string" &&
+    p.portType !== "MODBUS" &&
+    p.calibratedValue !== null &&
+    p.calibratedValue !== 0 &&
+    p.calibratedValue !== 1
+  );
+}
+
+// Port Details Tooltip Component
+function PortDetailsTooltip({
+  port,
 }: {
-  slaveId: string;
-  readId: string;
-  portKey: string;
+  port: ILatestPort | ILatestModbusPort;
+}) {
+  const [isVisible, setIsVisible] = useState(false);
+
+  const portDetails = {
+    rawValue: port.rawValue ?? "N/A",
+    calibration: {
+      scaling: port.calibration.scaling,
+      offset: port.calibration.offset,
+    },
+    status: port.status,
+    timestamp: port.timestamp
+      ? new Date(port.timestamp).toLocaleString()
+      : "N/A",
+  };
+
+  return (
+    <div className="relative inline-block">
+      <button
+        className="ml-2 p-1 rounded-full hover:bg-gray-200 text-gray-600 flex-shrink-0"
+        onMouseEnter={() => setIsVisible(true)}
+        onMouseLeave={() => setIsVisible(false)}
+        onClick={() => setIsVisible(!isVisible)}
+        aria-label="Port details"
+      >
+        <Info size={14} />
+      </button>
+      {isVisible && (
+        <div className="absolute bottom-full right-0 mb-2 w-56 bg-gray-900 text-white text-xs rounded-lg p-3 shadow-lg z-50">
+          <div className="space-y-2">
+            <div>
+              <span className="font-semibold">Raw Value:</span>
+              <div className="text-gray-300">{portDetails.rawValue}</div>
+            </div>
+            <div>
+              <span className="font-semibold">Calibration:</span>
+              <div className="text-gray-300 space-y-1">
+                <div>Scaling: {portDetails.calibration.scaling}</div>
+                <div>Offset: {portDetails.calibration.offset}</div>
+              </div>
+            </div>
+            <div>
+              <span className="font-semibold">Status:</span>
+              <div className="text-gray-300">{portDetails.status}</div>
+            </div>
+            <div>
+              <span className="font-semibold">Timestamp:</span>
+              <div className="text-gray-300">{portDetails.timestamp}</div>
+            </div>
+          </div>
+          <div className="absolute top-full right-2 w-2 h-2 bg-gray-900 transform rotate-45"></div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Modbus Read Details Tooltip
+function ModbusReadDetailsTooltip({
+  read,
+  slaveName,
+}: {
+  read: IModbusRead;
+  slaveName: string;
 }) {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -56,21 +121,44 @@ function ModbusInfoTooltip({
         onMouseEnter={() => setIsVisible(true)}
         onMouseLeave={() => setIsVisible(false)}
         onClick={() => setIsVisible(!isVisible)}
+        aria-label="Modbus details"
       >
         <Info size={14} />
       </button>
       {isVisible && (
-        <div className="absolute bottom-full right-0 mb-2 w-48 bg-gray-900 text-white text-xs rounded-lg p-3 shadow-lg z-50 mb-2">
-          <div className="space-y-1">
-            <p>
-              <span className="font-semibold">Slave ID:</span> {slaveId}
-            </p>
-            <p>
-              <span className="font-semibold">Read ID:</span> {readId}
-            </p>
-            <p>
-              <span className="font-semibold">Port Key:</span> {portKey}
-            </p>
+        <div className="absolute bottom-full right-0 mb-2 w-60 bg-gray-900 text-white text-xs rounded-lg p-3 shadow-lg z-50">
+          <div className="space-y-2">
+            <div>
+              <span className="font-semibold">Slave ID:</span>
+              <div className="text-gray-300">{slaveName}</div>
+            </div>
+            <div>
+              <span className="font-semibold">Read ID:</span>
+              <div className="text-gray-300 truncate">{read.readId}</div>
+            </div>
+            <div>
+              <span className="font-semibold">Raw Value:</span>
+              <div className="text-gray-300">{read.rawValue ?? "N/A"}</div>
+            </div>
+            <div>
+              <span className="font-semibold">Calibration:</span>
+              <div className="text-gray-300 space-y-1">
+                <div>Scaling: {read.scaling}</div>
+                <div>Offset: {read.offset}</div>
+              </div>
+            </div>
+            <div>
+              <span className="font-semibold">Register Type:</span>
+              <div className="text-gray-300">{read.registerType}</div>
+            </div>
+            <div>
+              <span className="font-semibold">Timestamp:</span>
+              <div className="text-gray-300">
+                {read.timestamp
+                  ? new Date(read.timestamp).toLocaleString()
+                  : "N/A"}
+              </div>
+            </div>
           </div>
           <div className="absolute top-full right-2 w-2 h-2 bg-gray-900 transform rotate-45"></div>
         </div>
@@ -79,59 +167,25 @@ function ModbusInfoTooltip({
   );
 }
 
+interface LatestValuesSnapshotProps {
+  deviceId: string;
+}
+
 export default function LatestValuesSnapshot({
   deviceId,
-  device,
-  isLoading: parentIsLoading,
 }: LatestValuesSnapshotProps) {
-  // Fetch latest values using the hook
-  const { data: latestValuesResponse, isLoading } = useValuesLatestRQ(deviceId);
+  const { data: response, isLoading } = useValuesLatestRQ(deviceId);
 
-  // Transform API response to PortSnapshot format
-  const snapshots = useMemo(() => {
-    if (
-      !latestValuesResponse?.data ||
-      !Array.isArray(latestValuesResponse.data)
-    ) {
-      return [];
-    }
-
-    return latestValuesResponse.data.map((value: IValue) => {
-      const port = device.ports?.find((p) => p.portKey === value.port.portKey);
-
-      // Extract Modbus read metadata if present
-      let modbusMeta = null;
-      if (value.modbusRead) {
-        modbusMeta = {
-          readId: value.modbusRead.readId,
-          slaveId: value.modbusRead.slaveId,
-          name: value.modbusRead.name || value.modbusRead.tag,
-        };
-      }
-
-      console.log("Value:", value, "Port:", port);
-
-      return {
-        portKey: value.port.portKey,
-        name: port?.name || value.port.portKey,
-        value: value.calibratedValue,
-        unit: value.unit || port?.unit,
-        quality: value.quality,
-        timestamp: value.ts,
-        type: value.port.portType,
-        modbusRead: modbusMeta,
-      };
-    });
-  }, [latestValuesResponse, device.ports]);
+  const ports = useMemo(() => response?.ports ?? [], [response?.ports]);
 
   const fetchTime = useMemo(() => {
-    if (latestValuesResponse?.data?.[0]?.ts) {
-      return new Date(latestValuesResponse.data[0].ts).toLocaleTimeString();
+    if (response?.ports?.[0]?.timestamp) {
+      return new Date(response.ports[0].timestamp).toLocaleTimeString();
     }
     return new Date().toLocaleTimeString();
-  }, [latestValuesResponse]);
+  }, [response?.ports]);
 
-  if (isLoading || parentIsLoading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center h-48">
         <Loader2 className="animate-spin w-6 h-6 text-primary" />
@@ -140,9 +194,9 @@ export default function LatestValuesSnapshot({
   }
 
   // Group ports by type
-  const digitalPorts = snapshots.filter((s) => s.type === "DIGITAL");
-  const analogPorts = snapshots.filter((s) => s.type === "ANALOG");
-  const modbusPorts = snapshots.filter((s) => s.type === "MODBUS");
+  const digitalPorts = ports.filter((p) => isDigitalPort(p));
+  const analogPorts = ports.filter((p) => isAnalogPort(p));
+  const modbusPorts = ports.filter((p) => isModbusPort(p));
 
   const getQualityColor = (quality?: string) => {
     switch (quality) {
@@ -193,16 +247,21 @@ export default function LatestValuesSnapshot({
           </h4>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
             {digitalPorts.map((port) => {
-              const isOn = port.value === 1 || port.value === true;
+              const p = port as ILatestPort;
+              const isOn =
+                p.calibratedValue === 1 || p.calibratedValue === true;
               return (
                 <div
-                  key={port.portKey}
+                  key={p.portKey}
                   className="p-2 border rounded-lg bg-white hover:shadow-sm transition-shadow"
                 >
-                  <p className="text-xs font-medium text-gray-600 truncate">
-                    {port.portKey}
-                  </p>
-                  <div className="flex items-center justify-between mt-1">
+                  <div className="flex items-center justify-between gap-1 mb-1">
+                    <p className="text-xs font-medium text-gray-600 truncate flex-1">
+                      {p.name}
+                    </p>
+                    <PortDetailsTooltip port={p} />
+                  </div>
+                  <div className="flex items-center justify-between">
                     <span
                       className={`text-xs font-bold px-2 py-0.5 rounded ${
                         isOn
@@ -213,10 +272,10 @@ export default function LatestValuesSnapshot({
                       {isOn ? "ON" : "OFF"}
                     </span>
                     <Badge
-                      variant={getQualityColor(port.quality)}
+                      variant={getQualityColor(p.quality)}
                       className="text-xs"
                     >
-                      {getQualityIcon(port.quality)}
+                      {getQualityIcon(p.quality)}
                     </Badge>
                   </div>
                 </div>
@@ -233,122 +292,105 @@ export default function LatestValuesSnapshot({
             📊 <span>Analog</span>
           </h4>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
-            {analogPorts.map((port) => (
-              <div
-                key={port.portKey}
-                className="p-2 border rounded-lg bg-white hover:shadow-sm transition-shadow"
-              >
-                <p className="text-xs font-medium text-gray-600 truncate">
-                  {port.portKey}
-                </p>
-                <p className="text-sm font-bold text-primary mt-1 truncate">
-                  {typeof port.value === "number"
-                    ? port.value.toFixed(1)
-                    : port.value}
-                </p>
-                <div className="flex items-center justify-between">
-                  {port.unit && (
-                    <p className="text-xs text-gray-500 truncate">
-                      {port.unit}
+            {analogPorts.map((port) => {
+              const p = port as ILatestPort;
+              return (
+                <div
+                  key={p.portKey}
+                  className="p-2 border rounded-lg bg-white hover:shadow-sm transition-shadow"
+                >
+                  <div className="flex items-center justify-between gap-1 mb-1">
+                    <p className="text-xs font-medium text-gray-600 truncate flex-1">
+                      {p.name}
                     </p>
-                  )}
-                  <Badge
-                    variant={getQualityColor(port.quality)}
-                    className="text-xs ml-auto"
-                  >
-                    {getQualityIcon(port.quality)}
-                  </Badge>
+                    <PortDetailsTooltip port={p} />
+                  </div>
+                  <p className="text-sm font-bold text-primary mb-1">
+                    {typeof p.calibratedValue === "number"
+                      ? p.calibratedValue.toFixed(2)
+                      : p.calibratedValue}
+                  </p>
+                  <div className="flex items-center justify-between">
+                    {p.unit && (
+                      <p className="text-xs text-gray-500 truncate">
+                        {p.unit}
+                      </p>
+                    )}
+                    <Badge
+                      variant={getQualityColor(p.quality)}
+                      className="text-xs ml-auto"
+                    >
+                      {getQualityIcon(p.quality)}
+                    </Badge>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
 
-      {/* Modbus Inputs - Grouped by Slave */}
+      {/* Modbus Inputs - Grouped by Port */}
       {modbusPorts.length > 0 && (
         <div>
           <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
             🔧 <span>Modbus</span>
           </h4>
-          {(() => {
-            // Group by slaveId
-            const groupedBySlave = modbusPorts.reduce(
-              (acc, port) => {
-                const slaveId = port.modbusRead?.slaveId || "unknown";
-                if (!acc[slaveId]) {
-                  acc[slaveId] = [];
-                }
-                acc[slaveId].push(port);
-                return acc;
-              },
-              {} as Record<string, typeof modbusPorts>,
-            );
-
+          {modbusPorts.map((modbusPort) => {
+            const mbPort = modbusPort as ILatestModbusPort;
             return (
-              <>
-                {Object.entries(groupedBySlave).map(([slaveId, slavePorts]) => (
-                  <div key={slaveId} className="mb-4">
-                    <h5 className="text-xs font-semibold text-amber-800 mb-2 px-1">
-                      Slave {slaveId}
-                    </h5>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {slavePorts.map((port) => (
-                        <div
-                          key={port.portKey}
-                          className="p-3 border border-amber-200 rounded-lg bg-amber-50 hover:shadow-sm transition-shadow"
+              <div key={mbPort.portKey} className="mb-4">
+                {mbPort.reads.map((read) => (
+                  <div
+                    key={read.readId}
+                    className="p-3 border border-amber-200 rounded-lg bg-amber-50 hover:shadow-sm transition-shadow mb-2 last:mb-0"
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium text-gray-700">
+                          {read.name || read.tag}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Slave {read.slaveId}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        <Badge
+                          variant={getQualityColor(read.quality)}
+                          className="text-xs"
                         >
-                          <div className="flex items-start justify-between mb-2">
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs font-medium text-gray-700">
-                                {port.modbusRead?.name || port.portKey}
-                              </p>
-                            </div>
-                            <div className="flex items-center flex-shrink-0">
-                              <Badge
-                                variant={getQualityColor(port.quality)}
-                                className="text-xs"
-                              >
-                                {getQualityIcon(port.quality)}
-                              </Badge>
-                              {port.modbusRead && (
-                                <ModbusInfoTooltip
-                                  slaveId={port.modbusRead.slaveId}
-                                  readId={port.modbusRead.readId}
-                                  portKey={port.portKey}
-                                />
-                              )}
-                            </div>
-                          </div>
-                          <div className="pt-2 border-t border-amber-200">
-                            <p className="text-sm font-bold text-gray-900">
-                              {typeof port.value === "number"
-                                ? port.value.toFixed(2)
-                                : port.value || "-"}
-                            </p>
-                            {port.unit && (
-                              <p className="text-xs text-gray-600">
-                                {port.unit}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      ))}
+                          {getQualityIcon(read.quality)}
+                        </Badge>
+                        <ModbusReadDetailsTooltip
+                          read={read}
+                          slaveName={read.slaveId}
+                        />
+                      </div>
+                    </div>
+                    <div className="pt-2 border-t border-amber-200">
+                      <p className="text-sm font-bold text-gray-900">
+                        {typeof read.calibratedValue === "number"
+                          ? read.calibratedValue.toFixed(2)
+                          : read.calibratedValue ?? "-"}
+                      </p>
+                      {read.unit && (
+                        <p className="text-xs text-gray-600">{read.unit}</p>
+                      )}
                     </div>
                   </div>
                 ))}
-              </>
+              </div>
             );
-          })()}
+          })}
         </div>
       )}
 
       {/* Empty State */}
-      {snapshots.length === 0 && (
+      {ports.length === 0 && (
         <div className="p-6 text-center border border-dashed border-gray-300 rounded-lg bg-gray-50">
           <p className="text-sm text-gray-500 mb-1">No values available</p>
           <p className="text-xs text-gray-400">
-            Device hasn`&apos;`t sent readings yet
+            Device hasn&apos;t sent readings yet
           </p>
         </div>
       )}
