@@ -1,6 +1,12 @@
 "use client";
 
 import { Badge } from "@/app/_components/Badge/Badge";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/app/_components/Card/Card";
 import { useValuesLatestRQ } from "@/app/_lib/_react-query-hooks/values/useValuesRQ";
 import {
   ILatestPort,
@@ -225,8 +231,8 @@ export default function LatestValuesSnapshot({
   };
 
   return (
-    <div className="space-y-4">
-      {/* Last Update Info - Compact */}
+    <div className="space-y-6">
+      {/* Last Update Info */}
       <div className="flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg">
         <div className="flex items-center gap-2">
           <Activity size={16} className="text-blue-600" />
@@ -239,165 +245,197 @@ export default function LatestValuesSnapshot({
         </Badge>
       </div>
 
-      {/* Digital Inputs - Compact Grid */}
+      {/* Digital Inputs - Card View */}
       {digitalPorts.length > 0 && (
-        <div>
-          <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
-            🔘 <span>Digital</span>
-          </h4>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
-            {digitalPorts.map((port) => {
-              const p = port as ILatestPort;
-              const isOn =
-                p.calibratedValue === 1 || p.calibratedValue === true;
-              return (
-                <div
-                  key={p.portKey}
-                  className="p-2 border rounded-lg bg-white hover:shadow-sm transition-shadow"
-                >
-                  <div className="flex items-center justify-between gap-1 mb-1">
-                    <p className="text-xs font-medium text-gray-600 truncate flex-1">
-                      {p.name}
-                    </p>
-                    <PortDetailsTooltip port={p} />
+        <Card className="max-w-6xl">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              🔘 <span>Digital Inputs</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+              {digitalPorts.map((port) => {
+                const p = port as ILatestPort;
+                const isOn =
+                  p.calibratedValue === 1 || p.calibratedValue === true;
+                return (
+                  <div
+                    key={p.portKey}
+                    className="p-2 border rounded-lg bg-white hover:shadow-sm transition-shadow"
+                  >
+                    <div className="flex items-center justify-between gap-1 mb-1">
+                      <p className="text-xs font-medium text-gray-600 truncate flex-1">
+                        {p.name}
+                      </p>
+                      <PortDetailsTooltip port={p} />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span
+                        className={`text-xs font-bold px-2 py-0.5 rounded ${
+                          isOn
+                            ? "bg-green-100 text-green-700"
+                            : "bg-gray-100 text-gray-600"
+                        }`}
+                      >
+                        {isOn ? "ON" : "OFF"}
+                      </span>
+                      <Badge
+                        variant={getQualityColor(p.quality)}
+                        className="text-xs"
+                      >
+                        {getQualityIcon(p.quality)}
+                      </Badge>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span
-                      className={`text-xs font-bold px-2 py-0.5 rounded ${
-                        isOn
-                          ? "bg-green-100 text-green-700"
-                          : "bg-gray-100 text-gray-600"
-                      }`}
-                    >
-                      {isOn ? "ON" : "OFF"}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
       )}
 
-      {/* Analog Inputs - Compact Grid */}
+      {/* Analog Inputs - Card View */}
       {analogPorts.length > 0 && (
-        <div>
-          <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
-            📊 <span>Analog</span>
-          </h4>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
-            {analogPorts.map((port) => {
-              const p = port as ILatestPort;
-              return (
-                <div
-                  key={p.portKey}
-                  className="p-2 border rounded-lg bg-white hover:shadow-sm transition-shadow"
-                >
-                  <div className="flex items-center justify-between gap-1 mb-1">
-                    <p className="text-xs font-medium text-gray-600 truncate flex-1">
-                      {p.name}
+        <Card className="max-w-6xl">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              📊 <span>Analog Inputs</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+              {analogPorts.map((port) => {
+                const p = port as ILatestPort;
+                return (
+                  <div
+                    key={p.portKey}
+                    className="p-2 border rounded-lg bg-white hover:shadow-sm transition-shadow"
+                  >
+                    <div className="flex items-center justify-between gap-1 mb-1">
+                      <p className="text-xs font-medium text-gray-600 truncate flex-1">
+                        {p.name}
+                      </p>
+                      <PortDetailsTooltip port={p} />
+                    </div>
+                    <p className="text-sm font-bold text-primary mb-1">
+                      {typeof p.calibratedValue === "number"
+                        ? p.calibratedValue.toFixed(2)
+                        : p.calibratedValue}
                     </p>
-                    <PortDetailsTooltip port={p} />
+                    <div className="flex items-center justify-between">
+                      {p.unit && (
+                        <p className="text-xs text-gray-500 truncate">
+                          {p.unit}
+                        </p>
+                      )}
+                      <Badge
+                        variant={getQualityColor(p.quality)}
+                        className="text-xs ml-auto"
+                      >
+                        {getQualityIcon(p.quality)}
+                      </Badge>
+                    </div>
                   </div>
-                  <p className="text-sm font-bold text-primary mb-1">
-                    {typeof p.calibratedValue === "number"
-                      ? p.calibratedValue.toFixed(2)
-                      : p.calibratedValue}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    {p.unit && (
-                      <p className="text-xs text-gray-500 truncate">{p.unit}</p>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
       )}
 
-      {/* Modbus Inputs - Compact Table View Grouped by Port & Slave */}
+      {/* Modbus Inputs - Card View */}
       {modbusPorts.length > 0 && (
-        <div>
-          <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-            🔧 <span>Modbus</span>
-          </h4>
-          <div className="space-y-3">
-            {modbusPorts.map((modbusPort) => {
-              const mbPort = modbusPort as ILatestModbusPort;
-              
-              // Group reads by slaveId
-              const readsBySlaveId = mbPort.reads.reduce(
-                (acc, read) => {
-                  const slaveId = read.slaveId;
-                  if (!acc[slaveId]) {
-                    acc[slaveId] = [];
-                  }
-                  acc[slaveId].push(read);
-                  return acc;
-                },
-                {} as Record<string, IModbusRead[]>
-              );
+        <Card className="max-w-4xl">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              🔧 <span>Modbus Inputs</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="space-y-4">
+              {modbusPorts.map((modbusPort) => {
+                const mbPort = modbusPort as ILatestModbusPort;
 
-              return (
-                <div key={mbPort.portKey} className="border rounded-lg overflow-hidden bg-white shadow-xs">
-                  {/* Port Header */}
-                  <div className="bg-amber-100 px-3 py-2 border-b border-amber-200">
-                    <p className="text-xs font-semibold text-amber-900">
-                      Port: {mbPort.portKey}
-                    </p>
-                  </div>
+                // Group reads by slaveId
+                const readsBySlaveId = mbPort.reads.reduce(
+                  (acc, read) => {
+                    const slaveId = read.slaveId;
+                    if (!acc[slaveId]) {
+                      acc[slaveId] = [];
+                    }
+                    acc[slaveId].push(read);
+                    return acc;
+                  },
+                  {} as Record<string, IModbusRead[]>,
+                );
 
-                  {/* Slaves and Reads */}
-                  <div className="divide-y divide-gray-100">
-                    {Object.entries(readsBySlaveId).map(([slaveId, reads]) => (
-                      <div key={slaveId} className="px-3 py-2">
-                        {/* Slave Header */}
-                        <p className="text-xs font-medium text-gray-600 mb-1.5">
-                          Slave <span className="font-bold text-gray-900">{slaveId}</span>
-                        </p>
+                return (
+                  <div
+                    key={mbPort.portKey}
+                    className="border rounded-lg overflow-hidden bg-gray-50"
+                  >
+                    {/* Port Header */}
+                    <div className="bg-amber-100 px-3 py-2 border-b border-amber-200">
+                      <p className="text-xs font-semibold text-amber-900">
+                        Port: {mbPort.portKey}
+                      </p>
+                    </div>
 
-                        {/* Reads Table */}
-                        <div className="space-y-1">
-                          {reads.map((read) => (
-                            <div
-                              key={read.readId}
-                              className="flex items-center justify-between gap-2 p-1.5 bg-gray-50 hover:bg-gray-100 rounded transition-colors group"
-                            >
-                              <div className="flex-1 min-w-0">
-                                <p className="text-xs font-medium text-gray-700 truncate">
-                                  {read.name || read.tag}
-                                </p>
-                              </div>
-                              <div className="flex items-center gap-2 flex-shrink-0">
-                                <div className="text-right">
-                                  <p className="text-sm font-bold text-gray-900">
-                                    {typeof read.calibratedValue === "number"
-                                      ? read.calibratedValue.toFixed(2)
-                                      : (read.calibratedValue ?? "-")}
+                    {/* Slaves and Reads */}
+                    <div className="divide-y divide-gray-200">
+                      {Object.entries(readsBySlaveId).map(([slaveId, reads]) => (
+                        <div key={slaveId} className="px-3 py-2">
+                          {/* Slave Header */}
+                          <p className="text-xs font-medium text-gray-600 mb-1.5">
+                            Slave{" "}
+                            <span className="font-bold text-gray-900">
+                              {slaveId}
+                            </span>
+                          </p>
+
+                          {/* Reads Table */}
+                          <div className="space-y-1">
+                            {reads.map((read) => (
+                              <div
+                                key={read.readId}
+                                className="flex items-center justify-between gap-2 p-1.5 bg-white hover:bg-blue-50 rounded transition-colors group"
+                              >
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-xs font-medium text-gray-700 truncate">
+                                    {read.name || read.tag}
                                   </p>
-                                  {read.unit && (
-                                    <p className="text-xs text-gray-500">
-                                      {read.unit}
-                                    </p>
-                                  )}
                                 </div>
-                                <ModbusReadDetailsTooltip
-                                  read={read}
-                                  slaveName={slaveId}
-                                />
+                                <div className="flex items-center gap-2 flex-shrink-0">
+                                  <div className="text-right">
+                                    <p className="text-sm font-bold text-gray-900">
+                                      {typeof read.calibratedValue === "number"
+                                        ? read.calibratedValue.toFixed(2)
+                                        : (read.calibratedValue ?? "-")}
+                                    </p>
+                                    {read.unit && (
+                                      <p className="text-xs text-gray-500">
+                                        {read.unit}
+                                      </p>
+                                    )}
+                                  </div>
+                                  <ModbusReadDetailsTooltip
+                                    read={read}
+                                    slaveName={slaveId}
+                                  />
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Empty State */}
