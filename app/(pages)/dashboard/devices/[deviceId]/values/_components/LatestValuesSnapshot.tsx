@@ -29,24 +29,13 @@ function isModbusPort(port: unknown): port is ILatestModbusPort {
 // Helper function to check if port is Digital
 function isDigitalPort(port: unknown): boolean {
   const p = port as Record<string, unknown>;
-  return (
-    typeof p.portType === "string" &&
-    p.portType !== "MODBUS" &&
-    p.calibratedValue !== null &&
-    (p.calibratedValue === 0 || p.calibratedValue === 1)
-  );
+  return typeof p.portKey === "string" && p.portKey.startsWith("DI_");
 }
 
 // Helper function to check if port is Analog
 function isAnalogPort(port: unknown): boolean {
   const p = port as Record<string, unknown>;
-  return (
-    typeof p.portType === "string" &&
-    p.portType !== "MODBUS" &&
-    p.calibratedValue !== null &&
-    p.calibratedValue !== 0 &&
-    p.calibratedValue !== 1
-  );
+  return typeof p.portKey === "string" && p.portKey.startsWith("AI_");
 }
 
 function PortDetailsTooltip({
@@ -188,36 +177,12 @@ export default function LatestValuesSnapshot({
     );
   }
 
+  console.log("Latest Values Snapshot Ports:", ports);
+
   // Group ports by type
   const digitalPorts = ports.filter((p) => isDigitalPort(p));
   const analogPorts = ports.filter((p) => isAnalogPort(p));
   const modbusPorts = ports.filter((p) => isModbusPort(p));
-
-  const getQualityColor = (quality?: string) => {
-    switch (quality) {
-      case "good":
-        return "success";
-      case "bad":
-        return "error";
-      case "uncertain":
-        return "warning";
-      default:
-        return "info";
-    }
-  };
-
-  const getQualityIcon = (quality?: string) => {
-    switch (quality) {
-      case "good":
-        return "✓";
-      case "bad":
-        return "✗";
-      case "uncertain":
-        return "?";
-      default:
-        return "•";
-    }
-  };
 
   return (
     <div className="space-y-6">
@@ -366,15 +331,12 @@ export default function LatestValuesSnapshot({
                         ([slaveId, reads]) => (
                           <div key={slaveId} className="px-3 py-2">
                             {/* Slave Header */}
-                            <p className="text-xs font-medium text-gray-600 mb-1.5">
-                              Slave{" "}
-                              <span className="font-bold text-gray-900">
-                                {slaveId}
-                              </span>
+                            <p className="text-sm font-bold text-gray-600 mb-1.5">
+                              Slave {slaveId}
                             </p>
 
                             {/* Reads Table */}
-                            <div className="space-y-1">
+                            <div className="space-y-1 pl-2 md:pl-4">
                               {reads.map((read) => (
                                 <div
                                   key={read.readId}
