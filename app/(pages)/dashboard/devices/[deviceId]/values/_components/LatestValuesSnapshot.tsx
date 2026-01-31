@@ -62,7 +62,7 @@ function PortDetailsTooltip({
     <div className="tooltip tooltip-left tooltip-hover">
       {/* Tooltip content */}
       <div className="tooltip-content z-50 w-56 rounded-lg bg-neutral text-neutral-content p-3 text-xs shadow-lg">
-        <div className="space-y-2">
+        <div className="text-left space-y-2">
           <div>
             <span className="font-semibold">Raw Value</span>
             <div className="opacity-70">{port.rawValue ?? "N/A"}</div>
@@ -115,7 +115,7 @@ function ModbusReadDetailsTooltip({
     <div className="z-1 tooltip tooltip-left tooltip-hover">
       {/* Tooltip content */}
       <div className="tooltip-content z-50 w-60 rounded-lg bg-neutral text-neutral-content p-3 text-xs shadow-lg">
-        <div className="space-y-2">
+        <div className="text-left space-y-2">
           <div>
             <span className="font-semibold">Slave</span>
             <div className="opacity-70">{slaveName}</div>
