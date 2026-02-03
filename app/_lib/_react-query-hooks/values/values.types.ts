@@ -139,6 +139,7 @@ export interface IModbusRead {
   readId: string;
   slaveId: string;
   name: string;
+  slaveName?: string;
   tag?: string;
   unit?: string;
   dataType?: string;
@@ -241,7 +242,7 @@ export interface IValuesSnapshotResponse {
   success: boolean;
   device: ILatestValueDevice;
   count: number;
-  ports: ILatestPortType[];
+  ports: Array<ILatestPortType>;
 }
 
 // Stats response

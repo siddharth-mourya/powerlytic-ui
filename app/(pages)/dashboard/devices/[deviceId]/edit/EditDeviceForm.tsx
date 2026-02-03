@@ -147,6 +147,7 @@ export function EditDeviceForm({ deviceId }: { deviceId: string }) {
           <Card>
             <CardContent className="p-6 space-y-6">
               <PortGroup
+                isDigital
                 title="Digital Inputs"
                 color="border-blue-300"
                 ports={filterPortsByPrefix(device?.ports, "DI")}
@@ -154,6 +155,7 @@ export function EditDeviceForm({ deviceId }: { deviceId: string }) {
                 errors={errors}
               />
               <PortGroup
+                isDigital={false}
                 title="Analog Inputs"
                 color="border-green-300"
                 ports={filterPortsByPrefix(device?.ports, "AI")}

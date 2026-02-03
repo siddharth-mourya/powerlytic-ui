@@ -13,11 +13,18 @@ interface PortGroupProps {
   ports?: IPortGroupWithIndex;
   register: UseFormRegister<IDevice>;
   errors?: FieldErrors<IDevice>;
+  isDigital?: boolean;
 }
 
 export type IPortGroupWithIndex = Array<IPort & { originalIndex: number }>;
 
-export function PortGroup({ title, ports, register, errors }: PortGroupProps) {
+export function PortGroup({
+  isDigital,
+  title,
+  ports,
+  register,
+  errors,
+}: PortGroupProps) {
   if (!ports?.length) return null;
 
   return (
@@ -49,15 +56,16 @@ export function PortGroup({ title, ports, register, errors }: PortGroupProps) {
                     required: "Name is required",
                   })}
                 />
-                <TextInput
-                  label="Unit"
-                  required
-                  error={errors?.ports?.[i]?.unit?.message}
-                  {...register(`ports.${i}.unit`, {
-                    required: "Unit is required",
-                  })}
-                />
-
+                {isDigital ? null : (
+                  <TextInput
+                    label="Unit"
+                    required
+                    error={errors?.ports?.[i]?.unit?.message}
+                    {...register(`ports.${i}.unit`, {
+                      required: "Unit is required",
+                    })}
+                  />
+                )}
                 <Select
                   label="Value Format"
                   required
@@ -98,30 +106,22 @@ export function PortGroup({ title, ports, register, errors }: PortGroupProps) {
                   <TextInput
                     placeholder="Min"
                     type="number"
-                    required
                     error={errors?.ports?.[i]?.thresholds?.min?.message}
                     {...register(`ports.${i}.thresholds.min`, {
-                      required: "Min threshold is required",
                       valueAsNumber: true,
                     })}
                   />
                   <TextInput
                     placeholder="Max"
                     type="number"
-                    required
                     error={errors?.ports?.[i]?.thresholds?.max?.message}
                     {...register(`ports.${i}.thresholds.max`, {
-                      required: "Max threshold is required",
                       valueAsNumber: true,
                     })}
                   />
                   <TextInput
                     placeholder="Message"
-                    required
-                    error={errors?.ports?.[i]?.thresholds?.message?.message}
-                    {...register(`ports.${i}.thresholds.message`, {
-                      required: "Message is required",
-                    })}
+                    {...register(`ports.${i}.thresholds.message`)}
                   />
                 </div>
               </div>

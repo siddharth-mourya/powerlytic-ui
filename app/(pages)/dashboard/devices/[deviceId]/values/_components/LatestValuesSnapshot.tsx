@@ -209,7 +209,7 @@ export default function LatestValuesSnapshot({
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                 {digitalPorts.map((port) => {
                   const p = port as ILatestPort;
                   const isOn =
@@ -253,7 +253,7 @@ export default function LatestValuesSnapshot({
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                 {analogPorts.map((port) => {
                   const p = port as ILatestPort;
                   return (
@@ -267,14 +267,14 @@ export default function LatestValuesSnapshot({
                         </p>
                         <PortDetailsTooltip port={p} />
                       </div>
-                      <p className="text-sm font-bold text-primary mb-1">
-                        {typeof p.calibratedValue === "number"
-                          ? p.calibratedValue.toFixed(2)
-                          : p.calibratedValue}
-                      </p>
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1">
+                        <p className="text-sm font-bold text-primary">
+                          {typeof p.calibratedValue === "number"
+                            ? p.calibratedValue.toFixed(2)
+                            : p.calibratedValue}
+                        </p>
                         {p.unit && (
-                          <p className="text-xs text-gray-500 truncate">
+                          <p className="text-sm font-bold text-gray-500 ">
                             {p.unit}
                           </p>
                         )}
@@ -332,7 +332,7 @@ export default function LatestValuesSnapshot({
                           <div key={slaveId} className="px-3 py-2">
                             {/* Slave Header */}
                             <p className="text-sm font-bold text-gray-600 mb-1.5">
-                              Slave {slaveId}
+                              Slave {slaveId}: {reads[0].slaveName}
                             </p>
 
                             {/* Reads Table */}
