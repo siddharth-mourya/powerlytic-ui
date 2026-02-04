@@ -12,6 +12,7 @@ import {
   ILatestPort,
   ILatestModbusPort,
   IModbusRead,
+  IModbusSlave,
 } from "@/app/_lib/_react-query-hooks/values/values.types";
 import { Loader2, Activity, Info } from "lucide-react";
 import { useMemo } from "react";
@@ -21,8 +22,8 @@ function isModbusPort(port: unknown): port is ILatestModbusPort {
   const p = port as Record<string, unknown>;
   return (
     p.portType === "MODBUS" &&
-    Array.isArray(p.reads) &&
-    (p.reads as unknown[]).length > 0
+    Array.isArray(p.slaves) &&
+    (p.slaves as unknown[]).length > 0
   );
 }
 
@@ -54,7 +55,9 @@ function PortDetailsTooltip({
         <div className="text-left space-y-2">
           <div>
             <span className="font-semibold">Raw Value</span>
-            <div className="opacity-70">{port.rawValue ?? "N/A"}</div>
+            <div className="opacity-70">
+              {(port as ILatestPort).rawValue ?? "N/A"}
+            </div>
           </div>
 
           <div>
@@ -87,8 +90,57 @@ function PortDetailsTooltip({
     </div>
   );
 }
-// Modbus Read Details Tooltip
 
+// Slave Tooltip
+function SlaveDetailsTooltip({ slave }: { slave: IModbusSlave }) {
+  return (
+    <div className="tooltip tooltip-hover">
+      {/* Tooltip content */}
+      <div className="tooltip-content z-50 w-60 rounded-lg bg-neutral text-neutral-content p-3 text-xs shadow-lg">
+        <div className="text-left space-y-2">
+          <div>
+            <span className="font-semibold">Slave ID</span>
+            <div className="opacity-70">{slave.slaveId}</div>
+          </div>
+
+          <div>
+            <span className="font-semibold">Name</span>
+            <div className="opacity-70">{slave.name || "N/A"}</div>
+          </div>
+
+          <div>
+            <span className="font-semibold">Polling</span>
+            <div className="opacity-70">
+              <div>Interval: {slave.polling.intervalMs} ms</div>
+              <div>Timeout: {slave.polling.timeoutMs} ms</div>
+              <div>Retries: {slave.polling.retries}</div>
+            </div>
+          </div>
+
+          <div>
+            <span className="font-semibold">Serial</span>
+            <div className="opacity-70">
+              <div>Baud Rate: {slave.serial.baudRate}</div>
+              <div>Data Bits: {slave.serial.dataBits}</div>
+              <div>Stop Bits: {slave.serial.stopBits}</div>
+              <div>Parity: {slave.serial.parity}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Trigger */}
+      <button
+        className="btn btn-ghost btn-xs text-base-content/60 hover:text-base-content"
+        aria-label="Slave details"
+      >
+        <Info size={14} />
+      </button>
+    </div>
+  );
+}
+
+// Modbus Read Details Tooltip
 function ModbusReadDetailsTooltip({
   read,
   slaveName,
@@ -287,6 +339,7 @@ export default function LatestValuesSnapshot({
           </Card>
         )}
       </div>
+
       {/* Modbus Inputs - Card View */}
       {modbusPorts.length > 0 && (
         <Card className="max-w-4xl">
@@ -299,19 +352,6 @@ export default function LatestValuesSnapshot({
             <div className="space-y-4">
               {modbusPorts.map((modbusPort) => {
                 const mbPort = modbusPort as ILatestModbusPort;
-
-                // Group reads by slaveId
-                const readsBySlaveId = mbPort.reads.reduce(
-                  (acc, read) => {
-                    const slaveId = read.slaveId;
-                    if (!acc[slaveId]) {
-                      acc[slaveId] = [];
-                    }
-                    acc[slaveId].push(read);
-                    return acc;
-                  },
-                  {} as Record<string, IModbusRead[]>,
-                );
 
                 return (
                   <div
@@ -327,49 +367,50 @@ export default function LatestValuesSnapshot({
 
                     {/* Slaves and Reads */}
                     <div className="divide-y divide-gray-200">
-                      {Object.entries(readsBySlaveId).map(
-                        ([slaveId, reads]) => (
-                          <div key={slaveId} className="px-3 py-2">
-                            {/* Slave Header */}
+                      {mbPort.slaves.map((slave) => (
+                        <div key={slave.slaveId} className="px-3 py-2">
+                          {/* Slave Header */}
+                          <div className="flex gap-2">
                             <p className="text-sm font-bold text-gray-600 mb-1.5">
-                              Slave {slaveId}: {reads[0].slaveName}
+                              Slave {slave.slaveId}:{" "}
+                              {slave.name || "Unnamed Slave"}
                             </p>
-
-                            {/* Reads Table */}
-                            <div className="space-y-1 pl-2 md:pl-4">
-                              {reads.map((read) => (
-                                <div
-                                  key={read.readId}
-                                  className="flex items-center justify-between gap-2 p-1.5 bg-white hover:bg-blue-50 rounded transition-colors group"
-                                >
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-xs font-medium text-gray-700 truncate">
-                                      {read.name || read.tag}
-                                    </p>
-                                  </div>
-                                  <div className="flex items-center gap-2 flex-shrink-0">
-                                    <div className="text-right flex gap-2 align-center">
-                                      <p className="text-sm font-bold text-gray-900">
-                                        {typeof read.calibratedValue ===
-                                        "number"
-                                          ? read.calibratedValue.toFixed(2)
-                                          : (read.calibratedValue ?? "-")}
-                                      </p>
-                                      {read.unit && (
-                                        <p className="text-sm ">{read.unit}</p>
-                                      )}
-                                    </div>
-                                    <ModbusReadDetailsTooltip
-                                      read={read}
-                                      slaveName={slaveId}
-                                    />
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
+                            <SlaveDetailsTooltip slave={slave} />
                           </div>
-                        ),
-                      )}
+
+                          {/* Reads Table */}
+                          <div className="space-y-1 pl-2 md:pl-4">
+                            {slave.reads.map((read: IModbusRead) => (
+                              <div
+                                key={read.readId}
+                                className="flex items-center justify-between gap-2 p-1.5 bg-white hover:bg-blue-50 rounded transition-colors group"
+                              >
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-xs font-medium text-gray-700 truncate">
+                                    {read.name || read.tag}
+                                  </p>
+                                </div>
+                                <div className="flex items-center gap-2 flex-shrink-0">
+                                  <div className="text-right flex gap-2 align-center">
+                                    <p className="text-sm font-bold text-gray-900">
+                                      {typeof read.calibratedValue === "number"
+                                        ? read.calibratedValue.toFixed(2)
+                                        : (read.calibratedValue ?? "-")}
+                                    </p>
+                                    {read.unit && (
+                                      <p className="text-sm ">{read.unit}</p>
+                                    )}
+                                  </div>
+                                  <ModbusReadDetailsTooltip
+                                    read={read}
+                                    slaveName={slave.slaveId}
+                                  />
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 );

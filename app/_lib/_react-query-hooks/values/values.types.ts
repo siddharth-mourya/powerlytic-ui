@@ -133,6 +133,20 @@ export interface IThresholds {
   message: string;
 }
 
+// Modbus Slaves
+export interface IModbusSlave {
+  slaveId: string;
+  name: string;
+  polling: { intervalMs: number; timeoutMs: number; retries: number };
+  serial: {
+    baudRate: number;
+    dataBits: number;
+    stopBits: number;
+    parity: string;
+  };
+  reads: IModbusRead[];
+}
+
 // 🔹 Modbus Read (nested in Modbus Port)
 export interface IModbusRead {
   portKey: string;
@@ -176,9 +190,18 @@ export interface ILatestPort {
 }
 
 // 🔹 Latest Modbus Port (with reads array)
-export interface ILatestModbusPort extends Omit<ILatestPort, "portType"> {
+export interface ILatestModbusPort extends Pick<
+  ILatestPort,
+  | "portType"
+  | "portKey"
+  | "name"
+  | "unit"
+  | "status"
+  | "calibration"
+  | "timestamp"
+> {
   portType: "MODBUS";
-  reads: IModbusRead[];
+  slaves: IModbusSlave[];
 }
 
 // 🔹 Latest Port Type (Digital/Analog/Modbus)
